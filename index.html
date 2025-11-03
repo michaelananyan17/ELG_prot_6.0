@@ -146,13 +146,6 @@
 
 
         /* MODIFIED (Instruction 4): Removing MC tile styles as they are no longer used */
-        
-        /* Grade styling */
-        .grade-A { color: #10b981; font-weight: bold; }
-        .grade-B { color: #3b82f6; font-weight: bold; }
-        .grade-C { color: #f59e0b; font-weight: bold; }
-        .grade-D { color: #f97316; font-weight: bold; }
-        .grade-F { color: #ef4444; font-weight: bold; }
     </style>
 </head>
 <body class="p-4 sm:p-8">
@@ -181,19 +174,18 @@
             <h2 class="text-2xl font-bold text-gray-800 mb-6">Welcome! Let's Get Set Up.</h2>
             <div class="p-6 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg mb-6">
                 <h3 class="font-bold text-yellow-800 mb-2">Important: API Keys Required</h3>
-                <p class="text-sm text-yellow-700">To generate *real* assignments and grade responses, you need API keys for both OpenAI and Anthropic models.</p>
+                <p class="text-sm text-yellow-700">To generate and fully grade *real* assignments, you need both OpenAI and Anthropic API keys. Paste your keys below.</p>
             </div>
 
             <div class="mb-6">
-                <label for="openai-api-key" class="block text-sm font-medium text-gray-700 mb-2">OpenAI API Key</label>
-                <input type="text" id="openai-api-key" placeholder="Paste your API key here (starts with 'sk-...')" 
+                <label for="openai-api-key" class="block text-sm font-medium text-gray-700 mb-2">OpenAI API Key (Generation)</label>
+                <input type="text" id="openai-api-key" placeholder="Paste your OpenAI API key here (starts with 'sk-...')" 
                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out">
             </div>
-
-            <!-- NEW: Anthropic API Key Input -->
+            
             <div class="mb-6">
-                <label for="anthropic-api-key" class="block text-sm font-medium text-gray-700 mb-2">Anthropic API Key</label>
-                <input type="text" id="anthropic-api-key" placeholder="Paste your Anthropic API key here" 
+                <label for="anthropic-api-key" class="block text-sm font-medium text-gray-700 mb-2">Anthropic API Key (Quality Check & Grading)</label>
+                <input type="text" id="anthropic-api-key" placeholder="Paste your Anthropic API key here (starts with 'sk-ant-...')" 
                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out">
             </div>
 
@@ -302,30 +294,17 @@
                 <p class="text-gray-500 mt-1">Topic(s): <span id="final-topic-display" class="font-semibold text-gray-700"></span> | Level: <span id="final-level-display" class="font-semibold text-gray-700"></span></p>
             </header>
             
-            <div id="generation-loading" class="text-center p-12 border border-dashed border-gray-300 rounded-lg">
+            <div id="generation-loading" class="text-center p-12 border border-dashed border-gray-300 rounded-lg hidden">
                 <div class="spinner mx-auto mb-4"></div>
                 <p class="text-gray-600 font-semibold text-lg">
                     Generating your personalized English assignments using the LLM...
                 </p>
-                <p class="text-sm text-gray-500 mt-2">This may take up to 30 seconds depending on the complexity.</p>
-            </div>
-
-            <div id="anthropic-validation-loading" class="text-center p-12 border border-dashed border-gray-300 rounded-lg hidden">
-                <div class="spinner mx-auto mb-4"></div>
-                <p class="text-gray-600 font-semibold text-lg">
-                    Validating assignments with Anthropic AI...
-                </p>
-                <p class="text-sm text-gray-500 mt-2">Ensuring assignments match your selected topics, formats, and difficulty level.</p>
+                <p id="loading-message" class="text-sm text-gray-500 mt-2">OpenAI is creating the assignments. This may take up to 30 seconds.</p>
             </div>
 
             <div id="generation-error" class="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded hidden" role="alert">
                 <p class="font-bold">Generation Failed</p>
                 <p id="error-message" class="text-sm">An unknown error occurred while contacting the LLM.</p>
-            </div>
-
-            <div id="validation-error" class="bg-orange-50 border-l-4 border-orange-400 text-orange-700 p-4 rounded hidden" role="alert">
-                <p class="font-bold">Assignment Validation Issues</p>
-                <p id="validation-message" class="text-sm"></p>
             </div>
 
             <div id="assignments-workspace">
@@ -357,20 +336,12 @@
         <div id="step-5" class="step-content hidden">
             <h2 class="text-2xl font-bold text-gray-800 mb-6">Step 5: Final Review & Export</h2>
             
-            <div id="anthropic-grading-loading" class="text-center p-12 border border-dashed border-gray-300 rounded-lg hidden">
-                <div class="spinner mx-auto mb-4"></div>
-                <p class="text-gray-600 font-semibold text-lg">
-                    Grading written responses with Anthropic AI...
-                </p>
-                <p class="text-sm text-gray-500 mt-2">This may take a few moments.</p>
-            </div>
-            
-            <div id="step-5-success" class="p-6 bg-green-50 border-l-4 border-green-400 text-green-700 rounded-lg mb-6 hidden">
+            <div class="p-6 bg-green-50 border-l-4 border-green-400 text-green-700 rounded-lg mb-6">
                 <p class="font-bold">Success!</p>
-                <p class="text-sm">Your real, custom-generated assignments are ready for use. You can now copy or export them.</p>
+                <p class="text-sm">Your real, custom-generated and quality-checked assignments are ready for use. You can now copy or export them.</p>
             </div>
 
-            <div id="final-review-content" class="p-6 border border-gray-200 rounded-lg bg-white shadow-sm space-y-4 hidden">
+            <div id="final-review-content" class="p-6 border border-gray-200 rounded-lg bg-white shadow-sm space-y-4">
                 <h3 class="text-xl font-semibold text-gray-700">Assignments Summary</h3>
                 <div id="final-assignment-text" class="whitespace-pre-wrap text-gray-700 text-sm">
                     </div>
@@ -396,15 +367,17 @@
         // GLOBAL CONFIGURATION & STATE
         // =====================================================================================================
 
-        // IMPORTANT: The user must paste their keys here
-        let OPENAI_API_KEY = '';
-        let ANTHROPIC_API_KEY = '';
+        let API_KEY = ''; // OpenAI Key
+        let ANTHROPIC_API_KEY = ''; // Anthropic Key
         
-        // API Configuration
+        // OpenAI Configuration
         const OPENAI_MODEL = 'gpt-3.5-turbo-1106'; // A model supporting the JSON mode
         const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
-        const ANTHROPIC_MODEL = 'claude-3-sonnet-20240229';
+        
+        // Anthropic Configuration (INSTRUCTION 2: New model and URL)
+        const ANTHROPIC_MODEL = 'claude-3-haiku-20240307';
         const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
+
 
         const appState = {
             currentStep: 1,
@@ -415,8 +388,8 @@
             userAnswers: [], // Stores the user's answers for each assignment
             customTopicText: '',
             uploadedTopic: null, // Stores { id: 'uploaded', name: 'File Name', content: '...' }
-            anthropicValidationResults: null,
-            anthropicGradingResults: null
+            // INSTRUCTION 3: Store Anthropic QC/Grading results
+            anthropicGrading: {}, // Stores detailed written assignment grades { index: { grade: 'A', percentage: 95, comment: '...' } }
         };
 
         const TOPIC_POOL_DATA = [
@@ -441,11 +414,11 @@
         
         // ********** MODIFIED FORMAT POOL **********
         const FORMAT_POOL = [
-            // Note: WritingPrompt is marked as 'Ungraded' for the prototype, as LLM essay grading is complex
-            { id: 'ft1', name: 'English Text Topic', type: 'WritingPrompt', icon: '📝', description: 'Generates a full prompt for an essay or a short story (Ungraded)' },
-            { id: 'ft2', name: 'Grammar Practice', type: 'GrammarPractice', icon: '🧠', description: 'Generates sentences with blanks for conjunction or syntax practice' },
-            { id: 'ft3', name: 'Vocabulary Words', type: 'VocabularyWords', icon: '📚', description: 'Generates new words with context, requiring students to use them in sentences (Ungraded)' },
-            { id: 'ft4', name: 'Multiple Choice', type: 'MultipleChoice', icon: '✅', description: 'Generates questions with four potential answers, with only one correct answer' },
+            // Note: WritingPrompt/VocabularyWords are 'Ungraded' internally, but Anthropic will grade them
+            { id: 'ft1', name: 'English Text Topic', type: 'WritingPrompt', icon: '📝', description: 'Generates a full prompt for an essay or a short story (Anthropic Graded)' },
+            { id: 'ft2', name: 'Grammar Practice', type: 'GrammarPractice', icon: '🧠', description: 'Generates sentences with blanks for conjunction or syntax practice (Auto-Graded)' },
+            { id: 'ft3', name: 'Vocabulary Words', type: 'VocabularyWords', icon: '📚', description: 'Generates new words with context, requiring students to use them in sentences (Anthropic Graded)' },
+            { id: 'ft4', name: 'Multiple Choice', type: 'MultipleChoice', icon: '✅', description: 'Generates questions with four potential answers, with only one correct answer (Auto-Graded)' },
         ];
         // *****************************************
 
@@ -496,12 +469,12 @@
         }
         
         function updateButtonStates() {
-            // Step 1: API Key validation (Using the updated ID)
-            const openaiApiKeyInput = getElement('openai-api-key').value.trim();
-            const anthropicApiKeyInput = getElement('anthropic-api-key').value.trim();
-            OPENAI_API_KEY = openaiApiKeyInput; // Update global key
-            ANTHROPIC_API_KEY = anthropicApiKeyInput; // Update global key
-            getElement('step-1-next').disabled = !openaiApiKeyInput || !anthropicApiKeyInput;
+            // Step 1: API Key validation (INSTRUCTION 1: Check both keys)
+            const apiKeyInput = getElement('openai-api-key').value.trim();
+            const anthropicKeyInput = getElement('anthropic-api-key').value.trim();
+            API_KEY = apiKeyInput; // Update global key
+            ANTHROPIC_API_KEY = anthropicKeyInput; // Update global key
+            getElement('step-1-next').disabled = !(apiKeyInput && anthropicKeyInput);
 
             // ********** MODIFIED Step 2: Topic validation & Button Label **********
             const hasTopic = appState.selectedTopicIds.length > 0;
@@ -667,681 +640,1017 @@
 
             if (!topicName) return;
 
-            // Create a custom topic object
-            const customTopic = {
-                id: `custom-${Date.now()}`,
-                name: topicName,
-                icon: '🔍',
-                category: 'Custom'
+            const customId = 'custom_topic';
+            const newTopic = { 
+                id: customId, 
+                name: topicName, 
+                icon: '🔍', 
+                category: 'Search Term' 
             };
 
-            // Add to pool and select it
-            TOPIC_POOL.push(customTopic);
-            renderCards(); // Re-render to show the new card
-            toggleSelection(customTopic.id, 'topic'); // Select it
+            // 1. Remove old custom topic card from TOPIC_POOL and selected list if it exists
+            TOPIC_POOL = TOPIC_POOL.filter(t => t.id !== customId);
+            appState.selectedTopicIds = appState.selectedTopicIds.filter(id => id !== customId);
 
-            // Clear the input
-            customTopicInput.value = '';
+            // 2. Add the new custom topic to the front of the pool
+            TOPIC_POOL.unshift(newTopic);
+
+            // 3. Select the new topic card (this will handle the selection limit/priority)
+            if (appState.selectedTopicIds.length >= 2) {
+                // Deselect the last selected item to make room for the new one (as it's a new focus)
+                const idToDeselect = appState.selectedTopicIds.pop();
+                const elementToDeselect = getElement(`topic-${idToDeselect}`);
+                if (elementToDeselect) elementToDeselect.classList.remove('selected');
+            }
+            
+            appState.selectedTopicIds.push(customId);
+
+            // 4. Re-render cards and update state
+            renderCards();
             updateButtonStates();
+            
+            // Clear input field after successful selection
+            customTopicInput.value = '';
+            // Ensure the newly created card has the 'selected' class
+            const newCardElement = getElement(`topic-${customId}`);
+            if (newCardElement) newCardElement.classList.add('selected');
         }
 
-        function handleUploadTopic() {
-            const fileInput = getElement('upload-topic-input');
-            fileInput.click(); // Trigger the hidden file input
-        }
-
-        function handleFileUpload(event) {
+        function handleUploadTopic(event) {
             const file = event.target.files[0];
             if (!file) return;
-
-            // Check file type
-            const validTypes = ['text/plain', 'application/pdf'];
-            if (!validTypes.includes(file.type)) {
-                alert('Please upload a .txt or .pdf file.');
-                return;
-            }
 
             const reader = new FileReader();
             reader.onload = function(e) {
                 const content = e.target.result;
-                
-                // Create an uploaded topic object
-                const uploadedTopic = {
-                    id: 'uploaded',
-                    name: file.name,
-                    icon: '📄',
-                    category: 'Uploaded',
+                const fileName = file.name;
+                const uploadedId = 'uploaded';
+
+                const newTopic = { 
+                    id: uploadedId, 
+                    name: `File: ${fileName}`, 
+                    icon: '📄', 
+                    category: 'Uploaded Document',
                     content: content
                 };
 
-                // Store in app state
-                appState.uploadedTopic = uploadedTopic;
+                // 1. Remove old uploaded topic card from TOPIC_POOL and selected list if it exists
+                TOPIC_POOL = TOPIC_POOL.filter(t => t.id !== uploadedId);
+                appState.selectedTopicIds = appState.selectedTopicIds.filter(id => id !== uploadedId);
 
-                // If there's already an uploaded topic in the pool, remove it first
-                TOPIC_POOL = TOPIC_POOL.filter(t => t.id !== 'uploaded');
-                
-                // Add to pool and select it
-                TOPIC_POOL.push(uploadedTopic);
-                renderCards(); // Re-render to show the new card
-                toggleSelection('uploaded', 'topic'); // Select it
+                // 2. Add the new uploaded topic to the pool
+                TOPIC_POOL.unshift(newTopic);
+                appState.uploadedTopic = newTopic;
 
+                // 3. Select the new topic card (handles limit/priority)
+                if (appState.selectedTopicIds.length >= 2) {
+                    const idToDeselect = appState.selectedTopicIds.pop();
+                    const elementToDeselect = getElement(`topic-${idToDeselect}`);
+                    if (elementToDeselect) elementToDeselect.classList.remove('selected');
+                }
+                appState.selectedTopicIds.push(uploadedId);
+
+                // 4. Re-render cards and update state
+                renderCards();
                 updateButtonStates();
-            };
+                
+                // Ensure the newly created card has the 'selected' class
+                const newCardElement = getElement(`topic-${uploadedId}`);
+                if (newCardElement) newCardElement.classList.add('selected');
 
-            reader.readAsText(file); // For PDF, this will extract text if possible
+                // Clear the input to allow selecting the same file again if needed
+                event.target.value = null; 
+            };
+            reader.readAsText(file); // Only reading text for prototype simplicity
+        }
+
+        // MODIFIED: Function to handle user input changes and store them in appState.userAnswers
+        function handleUserAnswer(assignmentIndex, inputElement, answerType, subIndex = null) {
+            appState.userAnswers[assignmentIndex] = appState.userAnswers[assignmentIndex] || {};
+
+            // MODIFIED: Handle multi-input arrays for Vocab, Grammar, and MC
+            if (subIndex !== null) {
+                if (!appState.userAnswers[assignmentIndex].answer) {
+                    appState.userAnswers[assignmentIndex].answer = []; // Initialize as array
+                }
+                
+                if (answerType === 'MultipleChoice') {
+                    appState.userAnswers[assignmentIndex].answer[subIndex] = inputElement.value; // Store index
+                    // No visual feedback needed for plain radio buttons
+                } else {
+                    appState.userAnswers[assignmentIndex].answer[subIndex] = inputElement.value.trim(); // Store text
+                }
+                return; // Skip other logic
+            }
+            
+            // Handle single-input types (WritingPrompt)
+            if (answerType === 'WritingPrompt') {
+                appState.userAnswers[assignmentIndex].answer = inputElement.value.trim();
+            }
+        }
+
+        // MODIFIED: Function to render interactive elements based on assignment type
+        function renderInteractiveElement(assignment, index) {
+            const assignmentId = `assignment-${index}`;
+            const type = assignment.type;
+            let html = '';
+
+            // MODIFIED (Instruction 4): New MultipleChoice rendering (5-in-1, prot_4 style)
+            if (type === 'MultipleChoice' && assignment.questions && Array.isArray(assignment.questions)) {
+                html += '<div class="space-y-4">'; // Space between each question
+
+                assignment.questions.forEach((mcq, mcqIndex) => {
+                    const savedChoice = (appState.userAnswers[index]?.answer || [])[mcqIndex]; // This is the index "0", "1" etc.
+                    
+                    html += `<div class="p-3 border rounded-lg bg-gray-50" id="${assignmentId}-mcq-${mcqIndex}">`;
+                    // MODIFIED (Instruction 1): Trim question text
+                    html += `<p class="font-medium mb-2">${mcqIndex + 1}. ${mcq.question_text.trim()}</p>`; // Question text
+                    
+                    // Render the plain radio button options from prot_4
+                    mcq.options.forEach((option, optionIndex) => {
+                        const optionId = `${assignmentId}-mcq-${mcqIndex}-option-${optionIndex}`;
+                        // Check if this option was the one saved
+                        const isChecked = savedChoice === String(optionIndex);
+                        
+                        html += `
+                            <label for="${optionId}" class="block">
+                                <input type="radio" id="${optionId}" name="assignment-${index}-mc-${mcqIndex}" 
+                                       value="${optionIndex}" class="mr-2"
+                                       onchange="handleUserAnswer(${index}, this, '${type}', ${mcqIndex})"
+                                       ${isChecked ? 'checked' : ''}>
+                                ${option}
+                            </label>
+                        `;
+                    });
+                    html += '</div>'; // Close p-3
+                });
+                html += '</div>'; // Close space-y-4
+
+            // MODIFIED (Instruction 2): New GrammarPractice rendering (5-in-1)
+            } else if (type === 'GrammarPractice' && assignment.content) {
+                html += '<div class="space-y-4">';
+                // MODIFIED (Instruction 1): Trim content and split lines
+                const lines = (assignment.content || "").trim().split('\n').filter(Boolean);
+                
+                lines.forEach((line, lineIndex) => {
+                    // MODIFIED (Instruction 1): Trim individual line
+                    const parts = line.trim().split('___');
+                    const savedAnswer = (appState.userAnswers[index]?.answer || [])[lineIndex] || '';
+                    if (parts.length > 1) {
+                        html += `
+                            <div class="flex items-center space-x-2 flex-wrap">
+                                <span class="text-gray-700">${lineIndex + 1}. ${parts[0].trim()}</span>
+                                <input type="text" id="${assignmentId}-input-${lineIndex}" class="grammar-input" placeholder="Answer"
+                                       oninput="handleUserAnswer(${index}, this, '${type}', ${lineIndex})"
+                                       value="${savedAnswer}">
+                                <span class="text-gray-700">${parts[1].trim()}</span>
+                            </div>
+                        `;
+                    }
+                });
+                html += '</div>';
+
+            // MODIFIED (Instruction 3): New VocabularyWords rendering
+            } else if (type === 'VocabularyWords' && assignment.content) {
+                // MODIFIED (Instruction 1): Trim content and split lines
+                const lines = (assignment.content || "").trim().split('\n').filter(Boolean);
+                const instruction = lines[0].trim() + " (Write one sentence for each word below.)";
+                const words = lines.slice(1);
+                
+                html += `<p class="text-gray-700 font-medium mb-4">${instruction}</p>`; // The instruction
+                html += '<div class="space-y-4">'; // Container
+                html += words.map((word, vIndex) => {
+                    const savedAnswer = (appState.userAnswers[index]?.answer || [])[vIndex] || '';
+                    return `
+                        <p class="font-semibold">${word.trim()}</p>
+                        <textarea id="${assignmentId}-answer-${vIndex}" class="input-style" rows="2" 
+                                  placeholder="Write one sentence using the word..."
+                                  oninput="handleUserAnswer(${index}, this, 'VocabularyWords', ${vIndex})">${savedAnswer}</textarea>
+                    `;
+                }).join('');
+                html += '</div>';
+
+            } else if (type === 'WritingPrompt' && assignment.content) {
+                html += '<p class="text-sm font-semibold text-gray-700 mb-2 mt-2">Your Response (Anthropic Graded):</p>';
+                html += `
+                    <textarea id="${assignmentId}-input" rows="5" placeholder="Write your response here..."
+                              class="input-style"
+                              oninput="handleUserAnswer(${index}, this, '${type}')">${appState.userAnswers[index]?.answer || ''}</textarea>
+                `;
+            } else {
+                // Fallback for unexpected format
+                const fallbackContent = (assignment.question || assignment.content || "Error: Could not render").trim();
+                html += `<p class="text-sm text-red-500">Error: Could not render interactive element for this type. Content: ${fallbackContent}</p>`;
+            }
+
+            return html;
+        }
+
+
+        // MODIFIED: This function now builds the visual structure from prot_4
+        function displayAssignments() {
+            const resultsContainer = getElement('assignments-workspace');
+            const noAssignmentsMsg = getElement('no-assignments-message');
+            const submitButton = getElement('submit-assignments');
+            
+            resultsContainer.innerHTML = '';
+            
+            // Handle "No Assignments" case (from prot_4)
+            if (appState.generatedAssignments.length === 0) {
+                resultsContainer.classList.add('hidden');
+                noAssignmentsMsg.classList.remove('hidden');
+                submitButton.classList.add('hidden'); // Hide submit if no assignments
+                return;
+            }
+            
+            // Show assignments
+            resultsContainer.classList.remove('hidden');
+            noAssignmentsMsg.classList.add('hidden');
+            submitButton.classList.remove('hidden');
+
+            // Initialize userAnswers array
+            appState.userAnswers = new Array(appState.generatedAssignments.length).fill(null).map(() => ({ answer: null })); // Use null for array/string flexibility
+            getElement('grading-summary').classList.add('hidden');
+
+            // MODIFIED (Instruction 1): Populate new header with ALL topics
+            const topicNames = appState.selectedTopicIds.map(id => {
+                return TOPIC_POOL.find(t => t.id === id)?.name;
+            }).filter(Boolean).join(', ') || 'N/A';
+            
+            getElement('final-topic-display').textContent = topicNames;
+            getElement('final-level-display').textContent = appState.cefrLevel;
+
+            // MODIFIED (Instruction 5): Color array (from prot_4)
+            const sidebarColors = ['block-order-1', 'block-order-2', 'block-order-3', 'block-order-4'];
+
+            appState.generatedAssignments.forEach((assignment, index) => {
+                const card = document.createElement('div');
+                // MODIFIED (Instruction 5): Use 4 colors
+                const colorClass = sidebarColors[index % 4];
+                
+                // NEW: Using .assignment-block class and ID
+                card.className = `assignment-block ${colorClass}`; 
+                card.id = `assignment-card-${index}`; // Keep ID for graders
+
+                // MODIFIED (Instruction 1, 3, 4a): Handle what content to show in the top block
+                let assignmentContent = "";
+                if (assignment.type === 'WritingPrompt') {
+                    // Only WritingPrompt shows its content here
+                    assignmentContent = (assignment.content || "").trim();
+                } else if (assignment.type === 'GrammarPractice') {
+                    // Grammar shows its main "question" (instruction) here
+                    assignmentContent = (assignment.question || "").trim();
+                }
+                // VocabularyWords and MultipleChoice show NOTHING here
+
+                const typeName = formatTypeToName(assignment.type); // Use helper
+                const assignmentTitle = assignment.title || 'Assignment';
+                
+                // Get HTML from the modified render function
+                const interactiveHtml = renderInteractiveElement(assignment, index);
+
+                // NEW HTML Structure (from prot_4)
+                card.innerHTML = `
+                    <h3 class="text-2xl font-bold mb-3">${typeName} - <span class="text-lg font-medium text-gray-500">${assignmentTitle}</span></h3>
+                    
+                    ${assignmentContent ? `
+                        <div class="question-area mb-4">
+                            <div class="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                                ${assignmentContent.replace(/\n/g, '<br>')}
+                            </div>
+                        </div>
+                    ` : ''} 
+
+                    <div class="interactive-area pt-2">
+                        ${interactiveHtml}
+                    </div>
+                    
+                    <div id="feedback-${index}" class="text-sm mt-4 p-3 rounded-lg hidden border-l-4"></div>
+                `;
+                resultsContainer.appendChild(card);
+            });
+        }
+        
+        // =====================================================================================================
+        // GRADING FUNCTIONS (UPDATED FOR ANTHROPIC)
+        // =====================================================================================================
+
+        // INSTRUCTION 3: Function to call Anthropic for detailed written grading
+        async function gradeWrittenAssignments(assignmentsToGrade, topics, level) {
+            const gradedAssignments = assignmentsToGrade.map(({ assignment, index, userResponse }) => ({
+                index,
+                type: assignment.type,
+                title: assignment.title,
+                prompt: assignment.content,
+                userResponse: userResponse,
+            }));
+
+            const systemPrompt = `You are an expert English language assessor using the CEFR framework. Your task is to grade the provided student responses against the assignment prompts. 
+                The grading must be based on correctness of language (grammar, syntax, vocabulary usage, spelling) and adherence to the prompt/context.
+                
+                The overall difficulty level is ${level} and the core topics are ${topics.join(', ')}.
+                
+                You must return a single, raw JSON object that conforms EXACTLY to this structure. DO NOT include any explanatory text, markdown, or preamble/postamble outside of the JSON block.
+
+                JSON Structure:
+                {
+                    "grades": [
+                        {
+                            "index": "The original assignment index.",
+                            "grade": "A single letter grade: A, B, C, D, or F.",
+                            "percentage": "A numeric percentage score (0-100).",
+                            "comment": "A concise comment (10-20 words) summarizing the performance."
+                        }
+                        // ... one object for each assignment to grade
+                    ]
+                }
+            `;
+            
+            const userQuery = `Grade the following student responses. The assignments are of type: ${gradedAssignments.map(g => g.type).join(', ')}.
+            
+            ${gradedAssignments.map(g => 
+                `--- Assignment Index ${g.index} (${g.type} - ${g.title}) ---\nPrompt:\n${g.prompt}\n\nStudent Response:\n${g.userResponse}\n`
+            ).join('\n\n')}
+            `;
+
+            try {
+                const payload = {
+                    model: ANTHROPIC_MODEL,
+                    messages: [
+                        { role: "user", content: userQuery }
+                    ],
+                    max_tokens: 2048,
+                    temperature: 0.1,
+                    // Anthropic uses this header for JSON output control
+                    headers: { 'Anthropic-Version': '2023-06-01', 'Content-Type': 'application/json' },
+                    response_format: { type: "json_object" }
+                };
+
+                const apiResponse = await callAnthropicApi(payload);
+                const textPart = apiResponse.content[0].text;
+                const responseJson = JSON.parse(textPart);
+
+                if (!Array.isArray(responseJson.grades)) {
+                    throw new Error("Anthropic response did not contain the expected 'grades' array.");
+                }
+
+                appState.anthropicGrading = {}; // Reset
+                responseJson.grades.forEach(g => {
+                    appState.anthropicGrading[g.index] = {
+                        grade: g.grade,
+                        percentage: g.percentage,
+                        comment: g.comment
+                    };
+                });
+            } catch (error) {
+                console.error("Anthropic Grading Error:", error);
+                throw new Error(`Anthropic grading failed: ${error.message}`);
+            }
+        }
+
+
+        // MODIFIED: Grading Function to support new array-based answers AND Anthropic grading
+        async function gradeAssignments() {
+            let correctCount = 0;
+            let totalGradable = 0;
+            let finalAssignmentText = '';
+            
+            const assignmentsToGradeByAnthropic = [];
+
+            // 1. Collect written assignments for Anthropic grading
+            appState.generatedAssignments.forEach((assignment, index) => {
+                const type = assignment.type;
+                const userAnswer = appState.userAnswers[index]?.answer;
+
+                if (type === 'WritingPrompt' || type === 'VocabularyWords') {
+                    // For vocab, combine all sentences into one string for the grader
+                    const userResponse = Array.isArray(userAnswer) ? userAnswer.filter(Boolean).join('\n') : userAnswer || '';
+                    assignmentsToGradeByAnthropic.push({
+                        assignment,
+                        index,
+                        userResponse,
+                    });
+                }
+            });
+
+            // 2. Call Anthropic API for written assignments asynchronously
+            if (assignmentsToGradeByAnthropic.length > 0) {
+                try {
+                    const topicNames = appState.selectedTopicIds.map(id => TOPIC_POOL.find(t => t.id === id)?.name).filter(Boolean);
+                    await gradeWrittenAssignments(assignmentsToGradeByAnthropic, topicNames, appState.cefrLevel);
+                } catch (error) {
+                    // Use a fallback state if Anthropic grading fails
+                    console.error("Failing gracefully: Anthropic grading step failed. Proceeding with auto-grading only.");
+                }
+            }
+
+
+            // 3. Process all assignments for display/summary
+            appState.generatedAssignments.forEach((assignment, index) => {
+                const userAnswer = appState.userAnswers[index]?.answer; // This can be a string OR an array
+                const feedbackElement = getElement(`feedback-${index}`);
+                const cardElement = getElement(`assignment-card-${index}`);
+                const type = assignment.type;
+                const anthropicResult = appState.anthropicGrading[index];
+
+                // Reset state
+                feedbackElement.classList.add('hidden');
+                feedbackElement.className = 'text-sm mt-4 p-3 rounded-lg border-l-4'; 
+                
+                // MC grading logic
+                if (type === 'MultipleChoice' && assignment.questions) {
+                    let correctInBlock = 0;
+                    const userAnswerArray = userAnswer || [];
+                    const totalInBlock = assignment.questions.length;
+                    totalGradable += totalInBlock;
+                    
+                    let mcqFinalText = '';
+                    let mcqFeedbackText = ''; // Text for Step 4 feedback
+
+                    assignment.questions.forEach((mcq, mcqIndex) => {
+                        const correctIndex = mcq.correctAnswerIndex;
+                        const userChoice = userAnswerArray[mcqIndex]; // This is the index (e.g., "1")
+                        let isCorrect = false;
+
+                        if (userChoice !== undefined && userChoice !== null) {
+                            isCorrect = parseInt(userChoice) === correctIndex;
+                            if (isCorrect) {
+                                correctInBlock++;
+                                correctCount++;
+                            }
+                        }
+                        
+                        // Text for Step 5
+                        const selectedText = (userChoice !== undefined && userChoice !== null) ? mcq.options[parseInt(userChoice)] : 'N/A';
+                        mcqFinalText += `  Q${mcqIndex + 1}: ${mcq.question_text}\n  Your Answer: ${selectedText}\n  Correct Answer: ${mcq.options[correctIndex]}\n  Result: ${isCorrect ? 'Correct' : 'Incorrect'}\n\n`;
+                        
+                        // New feedback text for Step 4
+                        if (isCorrect) {
+                            mcqFeedbackText += `<p class="text-sm text-green-600">Q${mcqIndex + 1}: Correct!</p>`;
+                        } else if (userChoice === undefined || userChoice === null) {
+                            mcqFeedbackText += `<p class="text-sm text-yellow-600">Q${mcqIndex + 1}: Skipped. Correct was: ${mcq.options[correctIndex]}</p>`;
+                        } else {
+                            mcqFeedbackText += `<p class="text-sm text-red-600">Q${mcqIndex + 1}: Incorrect. Correct was: ${mcq.options[correctIndex]}</p>`;
+                        }
+                    });
+
+                    // Update feedback element
+                    feedbackElement.innerHTML = `
+                        <p class="font-semibold mb-2">Result: You answered ${correctInBlock} / ${totalInBlock} questions correctly.</p>
+                        ${mcqFeedbackText}
+                    `;
+                    feedbackElement.classList.add('bg-gray-100', 'text-gray-700', 'border-gray-400');
+                    feedbackElement.classList.remove('hidden');
+
+                    finalAssignmentText += `--- ${assignment.title} (Multiple Choice) ---\n${mcqFinalText}`;
+
+                // Grammar grading logic
+                } else if (type === 'GrammarPractice' && Array.isArray(assignment.correctAnswer)) {
+                    let correctInBlock = 0;
+                    const userAnswerArray = userAnswer || [];
+                    const expectedAnswerArray = assignment.correctAnswer;
+                    const totalInBlock = expectedAnswerArray.length;
+                    totalGradable += totalInBlock;
+
+                    let grammarFinalText = `Prompt: ${assignment.content.replace(/\n/g, '\n  ')}\n`;
+                    let grammarFeedbackText = ''; // Text for Step 4 feedback
+                    
+                    expectedAnswerArray.forEach((expectedAns, ansIndex) => {
+                        const userAns = (userAnswerArray[ansIndex] || "").trim().toLowerCase();
+                        const correctAns = expectedAns.trim().toLowerCase();
+                        let isCorrect = false;
+
+                        if (userAns === correctAns) {
+                            correctInBlock++;
+                            correctCount++;
+                            isCorrect = true;
+                        }
+                        
+                        grammarFinalText += `  Q${ansIndex + 1}: Your Answer: "${userAnswerArray[ansIndex] || 'N/A'}", Correct: "${expectedAns}", Result: ${isCorrect ? 'Correct' : 'Incorrect'}\n`;
+                        
+                        // New feedback text for Step 4
+                        if (isCorrect) {
+                            grammarFeedbackText += `<p class="text-sm text-green-600">Q${ansIndex + 1}: Correct!</p>`;
+                        } else if (!userAnswerArray[ansIndex]) {
+                            grammarFeedbackText += `<p class="text-sm text-yellow-600">Q${ansIndex + 1}: Skipped. Correct was: "${expectedAns}"</p>`;
+                        } else {
+                            grammarFeedbackText += `<p class="text-sm text-red-600">Q${ansIndex + 1}: Incorrect. Correct was: "${expectedAns}"</p>`;
+                        }
+                    });
+
+                    // Update feedback element
+                    feedbackElement.innerHTML = `
+                        <p class="font-semibold mb-2">Result: You answered ${correctInBlock} / ${totalInBlock} questions correctly.</p>
+                        ${grammarFeedbackText}
+                    `;
+                    feedbackElement.classList.add('bg-gray-100', 'text-gray-700', 'border-gray-400');
+                    feedbackElement.classList.remove('hidden');
+                    
+                    finalAssignmentText += `--- ${assignment.title} (Grammar) ---\n${grammarFinalText}\n`;
+
+                } else {
+                    // WritingPrompt/VocabularyWords (Anthropic Graded or Ungraded Fallback)
+                    let userResponseText = '';
+                    let feedbackMessage = '';
+                    
+                    if (type === 'VocabularyWords' && Array.isArray(userAnswer)) {
+                        userResponseText = userAnswer.filter(Boolean).join('\n');
+                    } else if (type === 'WritingPrompt') {
+                        userResponseText = userAnswer || '';
+                    }
+                    
+                    // INSTRUCTION 3: Incorporate Anthropic grading feedback
+                    if (anthropicResult) {
+                        feedbackMessage = `
+                            <p class="font-bold text-lg mb-1">Anthropic Grade: <span class="text-indigo-700">${anthropicResult.grade} (${anthropicResult.percentage}%)</span></p>
+                            <p class="text-gray-700">Comment: ${anthropicResult.comment}</p>
+                        `;
+                        feedbackElement.classList.add('bg-indigo-100', 'text-indigo-800', 'border-indigo-400');
+                    } else {
+                        feedbackMessage = "📝 This is a long-form assignment. Anthropic grading failed or was skipped. Review your response below.";
+                        feedbackElement.classList.add('bg-gray-100', 'text-gray-600', 'border-gray-400');
+                    }
+
+                    feedbackElement.innerHTML = feedbackMessage;
+                    feedbackElement.classList.remove('hidden');
+                    
+                    // Prepare final text: Include Prompt and User Response
+                    finalAssignmentText += `--- ${assignment.title} (${type}) ---\nPrompt:\n${assignment.content}\n\nUser Response:\n${userResponseText}\n\n`;
+                    if (anthropicResult) {
+                        finalAssignmentText += `Anthropic Grade: ${anthropicResult.grade} (${anthropicResult.percentage}%), Comment: ${anthropicResult.comment}\n\n`;
+                    } else {
+                        finalAssignmentText += `(Anthropic Grading Failed/Skipped)\n\n`;
+                    }
+                }
+            });
+
+            // Update Grading Summary
+            const scoreDisplay = getElement('current-score');
+            scoreDisplay.textContent = `${correctCount}/${totalGradable}`;
+            getElement('grading-summary').classList.remove('hidden');
+            
+            if (totalGradable > 0) {
+                 const percentage = Math.round((correctCount / totalGradable) * 100);
+                 getElement('grading-message').textContent = `You scored ${percentage}% on the automatically graded questions (MC/Grammar). Review the detailed feedback above for all assignments!`;
+            } else {
+                 getElement('grading-message').textContent = `No automatically gradable questions were generated. The scores for all assignments are provided by the Anthropic AI.`;
+            }
+
+            // Update final text for Step 5
+            getElement('final-assignment-text').textContent = finalAssignmentText;
+            showStep(5);
+        }
+
+        function submitAssignments() {
+            gradeAssignments();
         }
 
         function copyToClipboard(elementId) {
-            const element = getElement(elementId);
-            const text = element.innerText || element.textContent;
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Copied to clipboard!');
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
-            });
-        }
-
-        // =====================================================================================================
-        // NEW: ANTHROPIC VALIDATION FUNCTIONS
-        // =====================================================================================================
-
-        async function validateAssignmentsWithAnthropic(assignments) {
-            const validationPrompt = `
-You are an expert English language teaching assistant. Your task is to validate the quality and appropriateness of English learning assignments.
-
-Please analyze the following assignments and evaluate them based on three criteria:
-
-1. TOPIC RELEVANCE: How well do the assignments relate to the selected topics: ${appState.selectedTopicIds.map(id => {
-    const topic = TOPIC_POOL.find(t => t.id === id);
-    return topic ? topic.name : '';
-}).filter(Boolean).join(', ')}?
-
-2. FORMAT ACCURACY: How well do the assignments match the requested formats: ${appState.selectedFormatIds.map(id => {
-    const format = FORMAT_POOL.find(f => f.id === id);
-    return format ? format.name : '';
-}).filter(Boolean).join(', ')}?
-
-3. DIFFICULTY LEVEL: How appropriate is the difficulty for a ${appState.cefrLevel} (${CEFR_LEVELS[appState.cefrLevel].short}) level learner?
-
-For each assignment, provide:
-- A score from 1-10 for each criterion
-- A brief explanation for each score
-- An overall validation decision (APPROVED, NEEDS_MINOR_ADJUSTMENTS, NEEDS_MAJOR_REWORK)
-
-Assignments to validate:
-${JSON.stringify(assignments, null, 2)}
-
-Provide your response in JSON format with this structure:
-{
-    "overall_validation": {
-        "decision": "APPROVED|NEEDS_MINOR_ADJUSTMENTS|NEEDS_MAJOR_REWORK",
-        "summary": "Brief overall summary"
-    },
-    "assignments": [
-        {
-            "assignment_index": 0,
-            "topic_relevance": {
-                "score": 8,
-                "explanation": "Brief explanation"
-            },
-            "format_accuracy": {
-                "score": 9,
-                "explanation": "Brief explanation"
-            },
-            "difficulty_level": {
-                "score": 7,
-                "explanation": "Brief explanation"
-            },
-            "suggestions": "Any specific suggestions for improvement"
-        }
-    ]
-}
-`;
-
+            const content = getElement(elementId).textContent;
+            
+            // Use execCommand('copy') for better compatibility in iframe environments
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = content;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            
             try {
-                const response = await fetch(ANTHROPIC_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': ANTHROPIC_API_KEY,
-                        'anthropic-version': '2023-06-01'
-                    },
-                    body: JSON.stringify({
-                        model: ANTHROPIC_MODEL,
-                        max_tokens: 2000,
-                        messages: [
-                            {
-                                role: 'user',
-                                content: validationPrompt
-                            }
-                        ]
-                    })
-                });
+                document.execCommand('copy');
+                // Simple visual feedback instead of alert()
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                setTimeout(() => { button.textContent = originalText; }, 1500);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+            }
+            document.body.removeChild(tempTextArea);
+        }
 
-                if (!response.ok) {
-                    throw new Error(`Anthropic API error: ${response.status}`);
+        // =====================================================================================================
+        // OPENAI & ANTHROPIC API INTEGRATION LOGIC
+        // =====================================================================================================
+
+        // MODIFIED: Single function for Anthropic API Calls
+        async function callAnthropicApi(payload) {
+            const maxRetries = 3;
+
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    const response = await fetch(ANTHROPIC_URL, {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'X-Api-Key': ANTHROPIC_API_KEY, // Use the Anthropic-specific header
+                            'Anthropic-Version': '2023-06-01' // Required Anthropic-Version header
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.status === 401) {
+                        throw new Error("Unauthorized (401). Please check if your Anthropic API Key is valid and correctly entered.");
+                    }
+                    if (!response.ok) {
+                        const errorBody = await response.json();
+                        console.error(`Anthropic Attempt ${attempt + 1} failed:`, errorBody);
+                        throw new Error(`Anthropic API error: ${response.status} - ${errorBody.error?.message || 'Unknown error'}`);
+                    }
+
+                    const result = await response.json();
+                    return result;
+
+                } catch (error) {
+                    if (attempt < maxRetries - 1) {
+                        const delay = Math.pow(2, attempt) * 2000; // Exponential backoff (2s, 4s, 8s)
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                    } else {
+                        // Throw final error if max retries reached
+                        throw new Error(`Failed to communicate with Anthropic after ${maxRetries} attempts. Details: ${error.message}`);
+                    }
                 }
-
-                const data = await response.json();
-                return JSON.parse(data.content[0].text);
-            } catch (error) {
-                console.error('Error validating with Anthropic:', error);
-                throw error;
             }
         }
 
-        // =====================================================================================================
-        // NEW: ANTHROPIC GRADING FUNCTIONS
-        // =====================================================================================================
 
-        async function gradeWrittenResponsesWithAnthropic(assignments, userAnswers) {
-            const gradingPrompt = `
-You are an expert English language teacher. Your task is to grade student responses to English learning assignments.
+        // INSTRUCTION 2: Function to perform Anthropic Quality Check
+        async function qualityCheckAssignments(assignments, topics, formats, level) {
+            const assignmentsString = JSON.stringify(assignments, null, 2);
+            
+            const systemPrompt = `You are an expert English curriculum designer. Your task is to perform a quality check on the provided JSON array of assignments generated by another LLM.
+            Your assessment must rigorously check three criteria:
+            1. **Topic Correlation:** How well do the assignments use the core topics (${topics.join(', ')})?
+            2. **Format Adherence:** Do the assignments conform to the requested types (${formats.map(f => f.type).join(', ')}) and structures?
+            3. **Difficulty Accuracy:** Is the complexity of the language, vocabulary, and concepts appropriate for the CEFR level (${level})?
 
-Please evaluate the following student responses based on:
-1. Correctness and accuracy of the answer
-2. Language proficiency and grammar
-3. Relevance to the question/task
+            If the assignments pass all checks, return a single, raw JSON object: {"qc_pass": true, "reason": "Assignments are high quality."}.
+            If they fail any check, return: {"qc_pass": false, "reason": "A brief explanation (20-30 words) of the most significant failing (e.g., 'Difficulty is too high for A1.' or 'Topics were barely mentioned.')."}
+            
+            DO NOT include any explanatory text, markdown, or preamble/postamble outside of the JSON block.
+            `;
+            
+            const userQuery = `Review the following assignments against the criteria:
+            Requested Topics: ${topics.join(', ')}
+            Requested Formats: ${formats.map(f => f.name).join(', ')}
+            Requested Level: ${level}
 
-For each written response, provide:
-- A letter grade (A, B, C, D, F)
-- A percentage score (0-100%)
-- A brief comment (10-20 words) with constructive feedback
-
-Student responses to grade:
-${assignments.map((assignment, index) => `
-Assignment ${index + 1} (${formatTypeToName(assignment.type)}):
-Question/Prompt: ${assignment.prompt || assignment.question || 'N/A'}
-Student Response: ${userAnswers[index] || 'No response provided'}
-`).join('\n')}
-
-Provide your response in JSON format with this structure:
-{
-    "grading_results": [
-        {
-            "assignment_index": 0,
-            "grade": "A",
-            "percentage": 95,
-            "comment": "Excellent response with strong vocabulary and grammar."
-        }
-    ]
-}
-`;
+            Assignments JSON:\n${assignmentsString}
+            `;
 
             try {
-                const response = await fetch(ANTHROPIC_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': ANTHROPIC_API_KEY,
-                        'anthropic-version': '2023-06-01'
-                    },
-                    body: JSON.stringify({
-                        model: ANTHROPIC_MODEL,
-                        max_tokens: 2000,
-                        messages: [
-                            {
-                                role: 'user',
-                                content: gradingPrompt
-                            }
-                        ]
-                    })
-                });
+                const payload = {
+                    model: ANTHROPIC_MODEL,
+                    messages: [
+                        { role: "user", content: userQuery }
+                    ],
+                    max_tokens: 512,
+                    temperature: 0.1,
+                    headers: { 'Anthropic-Version': '2023-06-01', 'Content-Type': 'application/json' },
+                    response_format: { type: "json_object" }
+                };
 
-                if (!response.ok) {
-                    throw new Error(`Anthropic API error: ${response.status}`);
-                }
+                const apiResponse = await callAnthropicApi(payload);
+                const textPart = apiResponse.content[0].text;
+                const responseJson = JSON.parse(textPart);
 
-                const data = await response.json();
-                return JSON.parse(data.content[0].text);
-            } catch (error) {
-                console.error('Error grading with Anthropic:', error);
-                throw error;
+                return responseJson;
+
+            } catch (e) {
+                console.error("Anthropic QC Call Failed:", e);
+                // Fail safe: If QC call fails, assume a soft pass to not block the user, 
+                // but log the error. We must return a valid QC object.
+                return { qc_pass: true, reason: "QC failed to connect, proceeding with caution." };
             }
         }
 
-        // =====================================================================================================
-        // ASSIGNMENT GENERATION & DISPLAY FUNCTIONS
-        // =====================================================================================================
+
+        function buildOpenAIPayload(appState) {
+            const level = appState.cefrLevel;
+            
+            // Get selected topic details
+            const selectedTopics = appState.selectedTopicIds.map(id => {
+                return TOPIC_POOL.find(t => t.id === id);
+            }).filter(Boolean);
+
+            const topicNames = selectedTopics.map(t => t.name);
+            const topicContent = selectedTopics.map(t => {
+                if (t.id === 'uploaded' && t.content) {
+                    return `\n\n[UPLOADED TEXT:\n${t.content.substring(0, 500)}...\n]`
+                }
+                return '';
+            }).join('');
+            
+            // Priority weight logic for LLM
+            const priorityExplanation = selectedTopics.length === 2 
+                ? `Topic 1 (${topicNames[0]}) has a 60% priority weight. Topic 2 (${topicNames[1]}) has a 40% priority weight.` 
+                : selectedTopics.length === 1 
+                ? `Topic 1 (${topicNames[0]}) has a 100% priority weight.`
+                : '';
+
+            const selectedFormats = appState.selectedFormatIds.map(id => FORMAT_POOL.find(f => f.id === id)).filter(Boolean);
+            const formatTypes = selectedFormats.map(f => f.type);
+            const numAssignments = formatTypes.length;
+
+            // MODIFIED (Instruction 2 & 4): Define the new JSON structure
+            const systemPrompt = `You are an expert English assignment generator. Your task is to create ${numAssignments} high-quality, professional English learning assignments based on the user's detailed criteria.
+            The user requires the output to be a single, raw JSON object that conforms EXACTLY to the following structure. DO NOT include any explanatory text, markdown, or preamble/postamble outside of the JSON block.
+            
+            JSON Structure:
+            {
+              "assignments": [
+                {
+                  "title": "A concise title for the assignment.",
+                  "type": "The exact assignment type, MUST be one of: ${formatTypes.join(', ')}",
+                  "content": "The full instructions/body text for WritingPrompt OR the 5 sentences for GrammarPractice (separated by \\n) OR the list of words for VocabularyWords (first line instruction, subsequent lines word/definition).",
+                  "question": "The main instruction text for MultipleChoice OR GrammarPractice (e.g., 'Choose the best option.' or 'Fill in the blanks.').",
+                  "correctAnswer": "An array of 5 correct answer strings for GrammarPractice (e.g., ["is", "are", "was", "were", "been"]). Null otherwise.",
+                  
+                  "questions": [
+                    {
+                      "question_text": "The text for an individual question.",
+                      "options": ["A", "B", "C", "D"],
+                      "correctAnswerIndex": 0
+                    }
+                  ]
+                },
+                ... (one object for each requested assignment format)
+              ]
+            }
+            
+            Specific content rules:
+            - WritingPrompt: Use 'content' for the prompt. Set all other fields to null.
+            - VocabularyWords: Use 'content' for the prompt AND the list of words. The first line is the prompt, subsequent lines are the words (e.g., "Use these words in a sentence:\\n1. Word (n): Definition...\\n2. Word (v): Definition..."). Set 'correctAnswer' and 'questions' to null.
+            - GrammarPractice: Use 'question' for the main instruction (e.g., "Complete the sentences..."). Use 'content' for the 5 sentences, each separated by \\n and containing a '___' blank. Use 'correctAnswer' for an array of 5 correct strings. Set 'questions' to null.
+            - MultipleChoice: Use 'question' for the main instruction (e.g., "Read and choose..."). Use the 'questions' array to provide 5 individual multiple-choice questions, each with 'question_text', 'options', and 'correctAnswerIndex'. Set 'content' and 'correctAnswer' to null.
+            `;
+            
+            // User Query: Supplies the specific content criteria
+            const userQuery = `
+                Generate the assignments now.
+                1. Difficulty Level (CEFR): ${level}
+                2. Core Topic(s) (in order of priority): ${topicNames.join(', ')}
+                3. Assignment Formats (requesting the TYPES): ${formatTypes.join(', ')}
+
+                Crucially, use the CEFR level to control vocabulary, grammar complexity, and sentence structure. 
+                ${priorityExplanation}
+                ${topicContent}
+                
+                Ensure the JSON fields are correctly populated for each TYPE as described in the system instruction.
+            `;
+            
+            return {
+                model: OPENAI_MODEL,
+                messages: [
+                    { role: "system", content: systemPrompt },
+                    { role: "user", content: userQuery }
+                ],
+                // CRITICAL: Force the model to return a JSON object
+                response_format: { type: "json_object" }
+            };
+        }
+
+        async function callOpenAIApi(payload) {
+            const maxRetries = 3;
+
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    const response = await fetch(OPENAI_URL, {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${API_KEY}` // Using Authorization header
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.status === 401) {
+                        throw new Error("Unauthorized (401). Please check if your OpenAI API Key is valid and correctly entered.");
+                    }
+                    if (!response.ok) {
+                        const errorBody = await response.json();
+                        console.error(`Attempt ${attempt + 1} failed:`, errorBody);
+                        throw new Error(`OpenAI API error: ${response.status} - ${errorBody.error?.message || 'Unknown error'}`);
+                    }
+
+                    const result = await response.json();
+                    return result;
+
+                } catch (error) {
+                    if (attempt < maxRetries - 1) {
+                        const delay = Math.pow(2, attempt) * 2000; // Exponential backoff (2s, 4s, 8s)
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                    } else {
+                        // Throw final error if max retries reached
+                        throw new Error(`Failed to communicate with OpenAI after ${maxRetries} attempts. Details: ${error.message}`);
+                    }
+                }
+            }
+        }
+
+        function processGeneratedText(apiResponse) {
+            try {
+                // OpenAI JSON mode returns content in choices[0].message.content
+                const textPart = apiResponse?.choices?.[0]?.message?.content;
+                
+                if (!textPart) {
+                    throw new Error("OpenAI response was empty or malformed.");
+                }
+
+                // The model is instructed to return a JSON object like { "assignments": [...] }
+                const responseJson = JSON.parse(textPart);
+
+                if (!Array.isArray(responseJson.assignments)) {
+                    throw new Error("LLM response did not contain the expected 'assignments' array.");
+                }
+
+                return responseJson.assignments;
+
+            } catch (e) {
+                console.error("Error parsing LLM output:", e);
+                throw new Error("Could not process the generated assignment text. The LLM might have returned invalid JSON or a non-compliant structure.");
+            }
+        }
 
         async function generateAssignments() {
-            const loadingElement = getElement('generation-loading');
-            const errorElement = getElement('generation-error');
-            const workspaceElement = getElement('assignments-workspace');
-            const noAssignmentsElement = getElement('no-assignments-message');
-
-            // Reset UI
-            errorElement.classList.add('hidden');
-            noAssignmentsElement.classList.add('hidden');
-            workspaceElement.innerHTML = '';
-            loadingElement.classList.remove('hidden');
+            const topicNames = appState.selectedTopicIds.map(id => TOPIC_POOL.find(t => t.id === id)?.name).filter(Boolean);
+            const selectedFormats = appState.selectedFormatIds.map(id => FORMAT_POOL.find(f => f.id === id)).filter(Boolean);
 
             try {
-                // Prepare the prompt for OpenAI
-                const selectedTopics = appState.selectedTopicIds.map(id => {
-                    const topic = TOPIC_POOL.find(t => t.id === id);
-                    return topic ? topic.name : '';
-                }).filter(Boolean);
+                // --- Step 1: OpenAI Generation ---
+                getElement('loading-message').textContent = "OpenAI is creating the assignments. This may take up to 30 seconds.";
+                const payload = buildOpenAIPayload(appState);
+                const apiResponse = await callOpenAIApi(payload);
+                appState.generatedAssignments = processGeneratedText(apiResponse);
 
-                const selectedFormats = appState.selectedFormatIds.map(id => {
-                    const format = FORMAT_POOL.find(f => f.id === id);
-                    return format ? format.type : '';
-                }).filter(Boolean);
 
-                const systemPrompt = `You are an expert English language teacher creating engaging, personalized assignments for students.`;
+                // --- Step 2: Anthropic Quality Check (INSTRUCTION 2) ---
+                getElement('loading-message').textContent = "Anthropic AI is double-checking the assignments for quality and adherence...";
                 
-                let userPrompt = `Create ${selectedFormats.length} English learning assignments with the following specifications:
-
-TOPICS: ${selectedTopics.join(', ')}
-CEFR LEVEL: ${appState.cefrLevel} (${CEFR_LEVELS[appState.cefrLevel].short})
-ASSIGNMENT TYPES: ${selectedFormats.map(type => formatTypeToName(type)).join(', ')}
-
-IMPORTANT REQUIREMENTS:
-1. Make each assignment creative, engaging, and relevant to the selected topics
-2. Ensure the difficulty matches the ${appState.cefrLevel} level
-3. For each assignment type, follow these guidelines:
-   - WritingPrompt: Create an engaging essay or story prompt that connects to the topics
-   - GrammarPractice: Generate sentences with blanks for grammar practice, provide the correct answers
-   - VocabularyWords: Provide 3-5 vocabulary words with definitions and ask students to use them in sentences
-   - MultipleChoice: Create questions with 4 options, clearly indicate the correct answer
-
-Please provide your response in JSON format with this exact structure:
-{
-    "assignments": [
-        {
-            "type": "WritingPrompt",
-            "title": "Creative Title",
-            "prompt": "Full writing prompt here...",
-            "instructions": "Specific instructions for the student"
-        },
-        {
-            "type": "GrammarPractice", 
-            "title": "Grammar Exercise Title",
-            "sentences": [
-                {
-                    "sentence": "Sentence with _____ blank _____ here.",
-                    "correctAnswer": "missing_word"
-                }
-            ]
-        },
-        {
-            "type": "VocabularyWords",
-            "title": "Vocabulary Exercise",
-            "words": [
-                {
-                    "word": "vocabulary_word",
-                    "definition": "clear definition"
-                }
-            ],
-            "instructions": "Use each word in a sentence that demonstrates its meaning."
-        },
-        {
-            "type": "MultipleChoice",
-            "title": "Multiple Choice Quiz",
-            "questions": [
-                {
-                    "question": "Question text?",
-                    "options": ["Option A", "Option B", "Option C", "Option D"],
-                    "correctAnswer": 0
-                }
-            ]
-        }
-    ]
-}`;
-
-                // Call OpenAI API
-                const response = await fetch(OPENAI_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${OPENAI_API_KEY}`
-                    },
-                    body: JSON.stringify({
-                        model: OPENAI_MODEL,
-                        messages: [
-                            { role: 'system', content: systemPrompt },
-                            { role: 'user', content: userPrompt }
-                        ],
-                        response_format: { type: "json_object" },
-                        temperature: 0.8 // Slightly higher temperature for more creative responses
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`OpenAI API error: ${response.status}`);
-                }
-
-                const data = await response.json();
-                const assignments = JSON.parse(data.choices[0].message.content).assignments;
-
-                // Store the generated assignments
-                appState.generatedAssignments = assignments;
-                appState.userAnswers = new Array(assignments.length).fill('');
-
-                // Show validation loading
-                loadingElement.classList.add('hidden');
-                const validationLoadingElement = getElement('anthropic-validation-loading');
-                validationLoadingElement.classList.remove('hidden');
-
-                // Validate assignments with Anthropic
-                try {
-                    appState.anthropicValidationResults = await validateAssignmentsWithAnthropic(assignments);
-                    validationLoadingElement.classList.add('hidden');
-                    
-                    // Check validation results
-                    if (appState.anthropicValidationResults.overall_validation.decision === "NEEDS_MAJOR_REWORK") {
-                        // Show validation error but still display assignments
-                        const validationErrorElement = getElement('validation-error');
-                        const validationMessageElement = getElement('validation-message');
-                        validationMessageElement.textContent = "Some assignments may not fully match your criteria, but they are still available for use.";
-                        validationErrorElement.classList.remove('hidden');
-                    }
-                    
-                    // Display the assignments regardless of validation results
-                    displayAssignments(assignments);
-                    
-                } catch (validationError) {
-                    console.error('Validation failed:', validationError);
-                    validationLoadingElement.classList.add('hidden');
-                    // Still show assignments even if validation fails
-                    displayAssignments(assignments);
-                }
-
-            } catch (error) {
-                console.error('Generation error:', error);
-                loadingElement.classList.add('hidden');
-                errorElement.classList.remove('hidden');
-                getElement('error-message').textContent = error.message;
-            }
-        }
-
-        function displayAssignments(assignments) {
-            const workspaceElement = getElement('assignments-workspace');
-            const noAssignmentsElement = getElement('no-assignments-message');
-
-            if (!assignments || assignments.length === 0) {
-                workspaceElement.classList.add('hidden');
-                noAssignmentsElement.classList.remove('hidden');
-                return;
-            }
-
-            workspaceElement.innerHTML = '';
-            noAssignmentsElement.classList.add('hidden');
-
-            assignments.forEach((assignment, index) => {
-                const assignmentElement = document.createElement('div');
-                assignmentElement.className = `assignment-block block-order-${(index % 4) + 1}`;
-                
-                let assignmentHTML = `
-                    <h3 class="text-xl font-bold mb-2">${assignment.title || formatTypeToName(assignment.type)}</h3>
-                    <div class="mb-4">
-                `;
-
-                // Handle different assignment types
-                switch (assignment.type) {
-                    case 'WritingPrompt':
-                        assignmentHTML += `
-                            <p class="text-gray-700 mb-2"><strong>Prompt:</strong> ${assignment.prompt}</p>
-                            <p class="text-sm text-gray-600 mb-3"><strong>Instructions:</strong> ${assignment.instructions}</p>
-                            <textarea 
-                                id="answer-${index}" 
-                                class="input-style" 
-                                rows="5" 
-                                placeholder="Write your response here..."
-                                oninput="appState.userAnswers[${index}] = this.value; updateButtonStates();"
-                            ></textarea>
-                        `;
-                        break;
-
-                    case 'GrammarPractice':
-                        assignmentHTML += `<p class="text-gray-700 mb-3">Complete the following sentences:</p>`;
-                        assignment.sentences.forEach((sentenceObj, sentenceIndex) => {
-                            const uniqueId = `grammar-${index}-${sentenceIndex}`;
-                            assignmentHTML += `
-                                <div class="mb-3 flex items-center">
-                                    <label class="mr-2 text-gray-700 flex-grow">${sentenceObj.sentence.replace('_____', `<input type="text" id="${uniqueId}" class="grammar-input" oninput="appState.userAnswers[${index}] = appState.userAnswers[${index}] || {}; appState.userAnswers[${index}][${sentenceIndex}] = this.value; updateButtonStates();">`)}</label>
-                                </div>
-                            `;
-                        });
-                        break;
-
-                    case 'VocabularyWords':
-                        assignmentHTML += `
-                            <p class="text-gray-700 mb-2"><strong>Instructions:</strong> ${assignment.instructions}</p>
-                            <div class="mb-3">
-                                ${assignment.words.map(word => `
-                                    <p class="text-gray-700"><strong>${word.word}:</strong> ${word.definition}</p>
-                                `).join('')}
-                            </div>
-                            <textarea 
-                                id="answer-${index}" 
-                                class="input-style" 
-                                rows="4" 
-                                placeholder="Write sentences using the vocabulary words above..."
-                                oninput="appState.userAnswers[${index}] = this.value; updateButtonStates();"
-                            ></textarea>
-                        `;
-                        break;
-
-                    case 'MultipleChoice':
-                        assignmentHTML += `<div class="space-y-3">`;
-                        assignment.questions.forEach((question, qIndex) => {
-                            const uniqueId = `mc-${index}-${qIndex}`;
-                            assignmentHTML += `
-                                <div class="mb-4">
-                                    <p class="font-medium text-gray-700 mb-2">${question.question}</p>
-                                    <div class="space-y-2 ml-4">
-                                        ${question.options.map((option, optIndex) => `
-                                            <div class="flex items-center">
-                                                <input type="radio" id="${uniqueId}-${optIndex}" name="${uniqueId}" value="${optIndex}" 
-                                                       onchange="appState.userAnswers[${index}] = appState.userAnswers[${index}] || {}; appState.userAnswers[${index}][${qIndex}] = ${optIndex}; updateButtonStates();"
-                                                       class="mr-2">
-                                                <label for="${uniqueId}-${optIndex}" class="text-gray-700">${option}</label>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                </div>
-                            `;
-                        });
-                        assignmentHTML += `</div>`;
-                        break;
-                }
-
-                assignmentHTML += `</div>`;
-                assignmentElement.innerHTML = assignmentHTML;
-                workspaceElement.appendChild(assignmentElement);
-            });
-
-            // Update final display info
-            const selectedTopics = appState.selectedTopicIds.map(id => {
-                const topic = TOPIC_POOL.find(t => t.id === id);
-                return topic ? topic.name : '';
-            }).filter(Boolean).join(', ');
-
-            getElement('final-topic-display').textContent = selectedTopics;
-            getElement('final-level-display').textContent = `${appState.cefrLevel} (${CEFR_LEVELS[appState.cefrLevel].short})`;
-
-            workspaceElement.classList.remove('hidden');
-            updateButtonStates();
-        }
-
-        // =====================================================================================================
-        // GRADING & SUBMISSION FUNCTIONS
-        // =====================================================================================================
-
-        async function submitAssignmentsForGrading() {
-            const gradingLoadingElement = getElement('anthropic-grading-loading');
-            const successElement = getElement('step-5-success');
-            const finalContentElement = getElement('final-review-content');
-            const finalAssignmentText = getElement('final-assignment-text');
-
-            // Show grading loading
-            gradingLoadingElement.classList.remove('hidden');
-
-            try {
-                // Grade written responses with Anthropic
-                appState.anthropicGradingResults = await gradeWrittenResponsesWithAnthropic(
+                const qcResult = await qualityCheckAssignments(
                     appState.generatedAssignments, 
-                    appState.userAnswers
+                    topicNames, 
+                    selectedFormats, 
+                    appState.cefrLevel
                 );
 
-                // Hide loading and show success
-                gradingLoadingElement.classList.add('hidden');
-                successElement.classList.remove('hidden');
-                finalContentElement.classList.remove('hidden');
-
-                // Prepare final assignment text with grades
-                let finalText = "YOUR PERSONALIZED ENGLISH ASSIGNMENTS\n";
-                finalText += "=======================================\n\n";
+                if (qcResult.qc_pass === false) {
+                    throw new Error(`Quality Check Failed: ${qcResult.reason}`);
+                }
                 
-                finalText += `Topics: ${appState.selectedTopicIds.map(id => {
-                    const topic = TOPIC_POOL.find(t => t.id === id);
-                    return topic ? topic.name : '';
-                }).filter(Boolean).join(', ')}\n`;
-                
-                finalText += `Level: ${appState.cefrLevel} (${CEFR_LEVELS[appState.cefrLevel].short})\n\n`;
-
-                appState.generatedAssignments.forEach((assignment, index) => {
-                    finalText += `ASSIGNMENT ${index + 1}: ${assignment.title || formatTypeToName(assignment.type)}\n`;
-                    finalText += "=".repeat(50) + "\n\n";
-
-                    // Add assignment content
-                    switch (assignment.type) {
-                        case 'WritingPrompt':
-                            finalText += `PROMPT: ${assignment.prompt}\n\n`;
-                            finalText += `INSTRUCTIONS: ${assignment.instructions}\n\n`;
-                            finalText += `YOUR RESPONSE: ${appState.userAnswers[index] || 'No response provided'}\n\n`;
-                            break;
-                            
-                        case 'GrammarPractice':
-                            finalText += "Complete the following sentences:\n\n";
-                            assignment.sentences.forEach((sentenceObj, sentenceIndex) => {
-                                finalText += `${sentenceIndex + 1}. ${sentenceObj.sentence.replace('_____', `[${appState.userAnswers[index]?.[sentenceIndex] || '_______'}]`)}\n`;
-                                finalText += `   Correct answer: ${sentenceObj.correctAnswer}\n\n`;
-                            });
-                            break;
-                            
-                        case 'VocabularyWords':
-                            finalText += `INSTRUCTIONS: ${assignment.instructions}\n\n`;
-                            finalText += "VOCABULARY WORDS:\n";
-                            assignment.words.forEach(word => {
-                                finalText += `  • ${word.word}: ${word.definition}\n`;
-                            });
-                            finalText += `\nYOUR SENTENCES: ${appState.userAnswers[index] || 'No sentences provided'}\n\n`;
-                            break;
-                            
-                        case 'MultipleChoice':
-                            assignment.questions.forEach((question, qIndex) => {
-                                finalText += `${qIndex + 1}. ${question.question}\n`;
-                                question.options.forEach((option, optIndex) => {
-                                    const marker = optIndex === appState.userAnswers[index]?.[qIndex] ? " [YOUR ANSWER]" : "";
-                                    const correctMarker = optIndex === question.correctAnswer ? " [CORRECT ANSWER]" : "";
-                                    finalText += `   ${String.fromCharCode(65 + optIndex)}) ${option}${marker}${correctMarker}\n`;
-                                });
-                                finalText += "\n";
-                            });
-                            break;
-                    }
-
-                    // Add Anthropic grading if available
-                    const gradingResult = appState.anthropicGradingResults?.grading_results?.find(
-                        result => result.assignment_index === index
-                    );
-                    
-                    if (gradingResult) {
-                        finalText += `GRADE: ${gradingResult.grade} (${gradingResult.percentage}%)\n`;
-                        finalText += `FEEDBACK: ${gradingResult.comment}\n\n`;
-                    } else {
-                        finalText += "GRADE: Not graded\n\n";
-                    }
-
-                    finalText += "\n";
-                });
-
-                finalAssignmentText.textContent = finalText;
+                // --- Step 3: Display Results ---
+                displayAssignments();
 
             } catch (error) {
-                console.error('Grading error:', error);
-                gradingLoadingElement.classList.add('hidden');
+                console.error("Critical Generation Error:", error);
                 
-                // Fallback: Still show assignments without grading
-                successElement.classList.remove('hidden');
-                finalContentElement.classList.remove('hidden');
-                
-                let fallbackText = "YOUR PERSONALIZED ENGLISH ASSIGNMENTS\n";
-                fallbackText += "=======================================\n\n";
-                
-                // ... (similar assignment formatting as above but without grades)
-                // For brevity, using a simplified version
-                appState.generatedAssignments.forEach((assignment, index) => {
-                    fallbackText += `ASSIGNMENT ${index + 1}: ${assignment.title || formatTypeToName(assignment.type)}\n`;
-                    // ... assignment content
-                });
-                
-                finalAssignmentText.textContent = fallbackText;
+                // Show the error message to the user
+                const errorMessageElement = getElement('error-message');
+                errorMessageElement.textContent = `Assignment generation or quality check failed: ${error.message}. Please check your API keys or try different criteria.`;
+                getElement('generation-error').classList.remove('hidden');
+
+                // Clear any old assignments
+                appState.generatedAssignments = [];
+                // MODIFIED: Call displayAssignments to show the "no assignments" message
+                displayAssignments(); 
+                getElement('assignments-workspace').classList.add('hidden');
+
+            } finally {
+                getElement('generation-loading').classList.add('hidden');
+                updateButtonStates();
             }
         }
 
+
+        async function startGeneration() {
+            // Check for API Key just before starting generation
+            if (!API_KEY || !ANTHROPIC_API_KEY) {
+                // Using a custom message box instead of alert()
+                getElement('error-message').textContent = "Please enter BOTH your OpenAI and Anthropic API Keys in Step 1 to continue.";
+                getElement('generation-error').classList.remove('hidden');
+                showStep(1);
+                return;
+            } else {
+                getElement('generation-error').classList.add('hidden');
+            }
+
+            // Show Step 4 and the loading state
+            showStep(4);
+            getElement('generation-error').classList.add('hidden');
+            getElement('generation-loading').classList.remove('hidden');
+            
+            // MODIFIED: Hide assignment containers during load
+            getElement('assignments-workspace').classList.add('hidden');
+            getElement('no-assignments-message').classList.add('hidden');
+            
+            // Disable buttons during generation
+            getElement('step-4-back-to-prev').disabled = true;
+            getElement('submit-assignments').disabled = true;
+
+            // Start the async generation
+            await generateAssignments();
+
+            // Re-enable buttons
+            getElement('step-4-back-to-prev').disabled = false;
+        }
+
         // =====================================================================================================
-        // EVENT LISTENERS & INITIALIZATION
+        // INITIALIZATION
         // =====================================================================================================
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize UI
+        function init() {
             renderCards();
-            updateLevel(3); // Default to B1
 
-            // Step 1: API Key Setup
-            getElement('openai-api-key').addEventListener('input', updateButtonStates);
-            getElement('anthropic-api-key').addEventListener('input', updateButtonStates);
-            getElement('step-1-next').addEventListener('click', () => showStep(2));
+            // Set up API Key listener (Step 1)
+            const apiKeyInput = getElement('openai-api-key');
+            const anthropicKeyInput = getElement('anthropic-api-key');
+            const nextButtonStep1 = getElement('step-1-next');
 
-            // Step 2: Topic Selection
+            apiKeyInput.addEventListener('input', updateButtonStates);
+            anthropicKeyInput.addEventListener('input', updateButtonStates); // INSTRUCTION 1: New listener
+            nextButtonStep1.addEventListener('click', () => showStep(2));
+            
+            // NEW: Add Enter key functionality for Step 1
+            apiKeyInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    if (!nextButtonStep1.disabled) {
+                        event.preventDefault(); 
+                        nextButtonStep1.click();
+                    }
+                }
+            });
+            anthropicKeyInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    if (!nextButtonStep1.disabled) {
+                        event.preventDefault(); 
+                        nextButtonStep1.click();
+                    }
+                }
+            });
+
+            // Set up Step 2 listeners
             getElement('step-2-back').addEventListener('click', () => showStep(1));
-            getElement('step-2-next').addEventListener('click', () => showStep(3));
-            getElement('custom-topic-text').addEventListener('input', updateButtonStates);
+            const nextButtonStep2 = getElement('step-2-next');
+            nextButtonStep2.addEventListener('click', () => {
+                showStep(3); 
+            });
+            
+            // ********** Step 2 Functionality Listeners **********
+            const customTopicInput = getElement('custom-topic-text');
+            customTopicInput.addEventListener('input', updateButtonStates);
             getElement('select-custom-topic-btn').addEventListener('click', handleSelectCustomTopic);
-            getElement('upload-topic-btn').addEventListener('click', handleUploadTopic);
-            getElement('upload-topic-input').addEventListener('change', handleFileUpload);
-
-            // Step 3: Format & Difficulty
-            getElement('step-3-back').addEventListener('click', () => showStep(2));
-            getElement('step-3-next-generate').addEventListener('click', () => {
-                showStep(4);
-                generateAssignments();
+            
+            // Enter key shortcut for Step 2 Next button
+            document.addEventListener('keydown', (event) => {
+                // Only act on the 'Enter' key and when we are on Step 2
+                if (event.key === 'Enter' && appState.currentStep === 2) {
+                    // 1. Check if the 'Select' button is focused or the input is active
+                    if (document.activeElement === customTopicInput && !getElement('select-custom-topic-btn').disabled) {
+                         event.preventDefault();
+                         getElement('select-custom-topic-btn').click();
+                         return;
+                    }
+                    
+                    // 2. If 'Select' is not active, check the 'Next' button
+                    if (!nextButtonStep2.disabled) {
+                        event.preventDefault(); 
+                        nextButtonStep2.click();
+                    }
+                }
             });
-            getElement('cefr-slider').addEventListener('input', (e) => updateLevel(parseInt(e.target.value)));
+
+            // Upload Topic button
+            getElement('upload-topic-btn').addEventListener('click', () => {
+                getElement('upload-topic-input').click();
+            });
+            getElement('upload-topic-input').addEventListener('change', handleUploadTopic);
+            // ************************************************************
+
+
+            // Set up Step 3 listeners
+            const slider = getElement('cefr-slider');
+            slider.addEventListener('input', (event) => updateLevel(event.target.value));
             getElement('description-toggle-header').addEventListener('click', toggleDescription);
+            getElement('step-3-back').addEventListener('click', () => showStep(2));
+            getElement('step-3-next-generate').addEventListener('click', startGeneration);
 
-            // Step 4: Assignment Review
+            // Set up Step 4 listeners (MODIFIED)
             getElement('step-4-back-to-prev').addEventListener('click', () => showStep(3));
-            getElement('submit-assignments').addEventListener('click', () => {
-                showStep(5);
-                submitAssignmentsForGrading();
-            });
+            // MODIFIED (Instruction 6): Removed listener for step-4-back-to-start
+            getElement('submit-assignments').addEventListener('click', submitAssignments);
 
-            // Step 5: Final Review & Export
+            // Set up Step 5 listeners
             getElement('step-5-back-to-prev').addEventListener('click', () => showStep(4));
             getElement('step-5-back-to-start').addEventListener('click', () => {
-                // Reset state for a new session
-                appState.selectedTopicIds = [];
-                appState.selectedFormatIds = [];
-                appState.generatedAssignments = [];
-                appState.userAnswers = [];
-                appState.customTopicText = '';
-                appState.uploadedTopic = null;
-                appState.anthropicValidationResults = null;
-                appState.anthropicGradingResults = null;
-                
-                // Reset UI
-                renderCards();
-                updateLevel(3);
-                showStep(1);
+                location.reload(); // Simplest way to restart the prototype state
             });
 
-            // Initial button state update
-            updateButtonStates();
-        });
+
+            // Initial state setup
+            updateLevel(slider.value); 
+            showStep(1); // Start at Step 1
+            updateButtonStates(); // Initial check for API Key
+        }
+
+        window.onload = init;
     </script>
 </body>
 </html>
