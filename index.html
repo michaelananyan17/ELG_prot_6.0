@@ -152,7 +152,7 @@
     <div class="app-container">
         <div id="header-section" class="mb-8">
             <h1 class="text-3xl font-extrabold text-gray-900 mb-2 text-center">PELE Assignment Generator</h1>
-            <p class="text-gray-500 text-center">Powered by OpenAI & Anthropic</p>
+            <p class="text-gray-500 text-center">Powered by OpenAI</p>
         </div>
 
         <div class="mb-8">
@@ -173,19 +173,13 @@
         <div id="step-1" class="step-content">
             <h2 class="text-2xl font-bold text-gray-800 mb-6">Welcome! Let's Get Set Up.</h2>
             <div class="p-6 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg mb-6">
-                <h3 class="font-bold text-yellow-800 mb-2">Important: API Keys Required</h3>
-                <p class="text-sm text-yellow-700">To generate and fully grade *real* assignments, you need both OpenAI and Anthropic API keys. Paste your keys below.</p>
+                <h3 class="font-bold text-yellow-800 mb-2">Important: OpenAI API Key Required</h3>
+                <p class="text-sm text-yellow-700">To generate *real* assignments, you need an API key for the OpenAI model. Paste your key below.</p>
             </div>
 
             <div class="mb-6">
-                <label for="openai-api-key" class="block text-sm font-medium text-gray-700 mb-2">OpenAI API Key (Generation)</label>
-                <input type="text" id="openai-api-key" placeholder="Paste your OpenAI API key here (starts with 'sk-...')" 
-                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out">
-            </div>
-            
-            <div class="mb-6">
-                <label for="anthropic-api-key" class="block text-sm font-medium text-gray-700 mb-2">Anthropic API Key (Quality Check & Grading)</label>
-                <input type="text" id="anthropic-api-key" placeholder="Paste your Anthropic API key here (starts with 'sk-ant-...')" 
+                <label for="openai-api-key" class="block text-sm font-medium text-gray-700 mb-2">OpenAI API Key</label>
+                <input type="text" id="openai-api-key" placeholder="Paste your API key here (starts with 'sk-...')" 
                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out">
             </div>
 
@@ -299,7 +293,7 @@
                 <p class="text-gray-600 font-semibold text-lg">
                     Generating your personalized English assignments using the LLM...
                 </p>
-                <p id="loading-message" class="text-sm text-gray-500 mt-2">OpenAI is creating the assignments. This may take up to 30 seconds.</p>
+                <p class="text-sm text-gray-500 mt-2">This may take up to 30 seconds depending on the complexity.</p>
             </div>
 
             <div id="generation-error" class="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded hidden" role="alert">
@@ -338,7 +332,7 @@
             
             <div class="p-6 bg-green-50 border-l-4 border-green-400 text-green-700 rounded-lg mb-6">
                 <p class="font-bold">Success!</p>
-                <p class="text-sm">Your real, custom-generated and quality-checked assignments are ready for use. You can now copy or export them.</p>
+                <p class="text-sm">Your real, custom-generated assignments are ready for use. You can now copy or export them.</p>
             </div>
 
             <div id="final-review-content" class="p-6 border border-gray-200 rounded-lg bg-white shadow-sm space-y-4">
@@ -367,17 +361,12 @@
         // GLOBAL CONFIGURATION & STATE
         // =====================================================================================================
 
-        let API_KEY = ''; // OpenAI Key
-        let ANTHROPIC_API_KEY = ''; // Anthropic Key
+        // IMPORTANT: The user must paste their key here
+        let API_KEY = '';
         
         // OpenAI Configuration
         const OPENAI_MODEL = 'gpt-3.5-turbo-1106'; // A model supporting the JSON mode
         const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
-        
-        // Anthropic Configuration (INSTRUCTION 2: New model and URL)
-        const ANTHROPIC_MODEL = 'claude-3-haiku-20240307';
-        const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
-
 
         const appState = {
             currentStep: 1,
@@ -388,8 +377,6 @@
             userAnswers: [], // Stores the user's answers for each assignment
             customTopicText: '',
             uploadedTopic: null, // Stores { id: 'uploaded', name: 'File Name', content: '...' }
-            // INSTRUCTION 3: Store Anthropic QC/Grading results
-            anthropicGrading: {}, // Stores detailed written assignment grades { index: { grade: 'A', percentage: 95, comment: '...' } }
         };
 
         const TOPIC_POOL_DATA = [
@@ -414,11 +401,11 @@
         
         // ********** MODIFIED FORMAT POOL **********
         const FORMAT_POOL = [
-            // Note: WritingPrompt/VocabularyWords are 'Ungraded' internally, but Anthropic will grade them
-            { id: 'ft1', name: 'English Text Topic', type: 'WritingPrompt', icon: '📝', description: 'Generates a full prompt for an essay or a short story (Anthropic Graded)' },
-            { id: 'ft2', name: 'Grammar Practice', type: 'GrammarPractice', icon: '🧠', description: 'Generates sentences with blanks for conjunction or syntax practice (Auto-Graded)' },
-            { id: 'ft3', name: 'Vocabulary Words', type: 'VocabularyWords', icon: '📚', description: 'Generates new words with context, requiring students to use them in sentences (Anthropic Graded)' },
-            { id: 'ft4', name: 'Multiple Choice', type: 'MultipleChoice', icon: '✅', description: 'Generates questions with four potential answers, with only one correct answer (Auto-Graded)' },
+            // Note: WritingPrompt is marked as 'Ungraded' for the prototype, as LLM essay grading is complex
+            { id: 'ft1', name: 'English Text Topic', type: 'WritingPrompt', icon: '📝', description: 'Generates a full prompt for an essay or a short story (Ungraded)' },
+            { id: 'ft2', name: 'Grammar Practice', type: 'GrammarPractice', icon: '🧠', description: 'Generates sentences with blanks for conjunction or syntax practice' },
+            { id: 'ft3', name: 'Vocabulary Words', type: 'VocabularyWords', icon: '📚', description: 'Generates new words with context, requiring students to use them in sentences (Ungraded)' },
+            { id: 'ft4', name: 'Multiple Choice', type: 'MultipleChoice', icon: '✅', description: 'Generates questions with four potential answers, with only one correct answer' },
         ];
         // *****************************************
 
@@ -446,6 +433,22 @@
             return format ? format.name : type;
         }
 
+        /**
+         * FIX: Robustly cleans and normalizes strings for case-insensitive and whitespace-tolerant comparison.
+         * This helps fix grading flaws where invisible characters or extra spaces cause mismatches.
+         * For Grammar Practice (one-word answers), this removes punctuation for better matching.
+         */
+        function cleanAndNormalize(str) {
+            if (typeof str !== 'string' || str === null) return '';
+            
+            // 1. Convert to string, replace non-word characters with a single space, and remove all underscores
+            // This is slightly aggressive but necessary to handle subtle LLM output errors
+            let cleaned = str.replace(/[^a-zA-Z0-9\s]/g, ' '); 
+            
+            // 2. Reduce multiple spaces to single space, trim, and convert to lower case
+            return cleaned.replace(/\s+/g, ' ').trim().toLowerCase();
+        }
+
         function showStep(stepNumber) {
             appState.currentStep = stepNumber;
             document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
@@ -469,12 +472,10 @@
         }
         
         function updateButtonStates() {
-            // Step 1: API Key validation (INSTRUCTION 1: Check both keys)
+            // Step 1: API Key validation (Using the updated ID)
             const apiKeyInput = getElement('openai-api-key').value.trim();
-            const anthropicKeyInput = getElement('anthropic-api-key').value.trim();
             API_KEY = apiKeyInput; // Update global key
-            ANTHROPIC_API_KEY = anthropicKeyInput; // Update global key
-            getElement('step-1-next').disabled = !(apiKeyInput && anthropicKeyInput);
+            getElement('step-1-next').disabled = !apiKeyInput;
 
             // ********** MODIFIED Step 2: Topic validation & Button Label **********
             const hasTopic = appState.selectedTopicIds.length > 0;
@@ -738,14 +739,14 @@
                     appState.userAnswers[assignmentIndex].answer[subIndex] = inputElement.value; // Store index
                     // No visual feedback needed for plain radio buttons
                 } else {
-                    appState.userAnswers[assignmentIndex].answer[subIndex] = inputElement.value.trim(); // Store text
+                    appState.userAnswers[assignmentIndex].answer[subIndex] = inputElement.value; // Store text (don't trim here, do it on grading)
                 }
                 return; // Skip other logic
             }
             
             // Handle single-input types (WritingPrompt)
             if (answerType === 'WritingPrompt') {
-                appState.userAnswers[assignmentIndex].answer = inputElement.value.trim();
+                appState.userAnswers[assignmentIndex].answer = inputElement.value;
             }
         }
 
@@ -831,7 +832,7 @@
                 html += '</div>';
 
             } else if (type === 'WritingPrompt' && assignment.content) {
-                html += '<p class="text-sm font-semibold text-gray-700 mb-2 mt-2">Your Response (Anthropic Graded):</p>';
+                html += '<p class="text-sm font-semibold text-gray-700 mb-2 mt-2">Your Response (Ungraded):</p>';
                 html += `
                     <textarea id="${assignmentId}-input" rows="5" placeholder="Write your response here..."
                               class="input-style"
@@ -931,133 +932,23 @@
             });
         }
         
-        // =====================================================================================================
-        // GRADING FUNCTIONS (UPDATED FOR ANTHROPIC)
-        // =====================================================================================================
-
-        // INSTRUCTION 3: Function to call Anthropic for detailed written grading
-        async function gradeWrittenAssignments(assignmentsToGrade, topics, level) {
-            const gradedAssignments = assignmentsToGrade.map(({ assignment, index, userResponse }) => ({
-                index,
-                type: assignment.type,
-                title: assignment.title,
-                prompt: assignment.content,
-                userResponse: userResponse,
-            }));
-
-            const systemPrompt = `You are an expert English language assessor using the CEFR framework. Your task is to grade the provided student responses against the assignment prompts. 
-                The grading must be based on correctness of language (grammar, syntax, vocabulary usage, spelling) and adherence to the prompt/context.
-                
-                The overall difficulty level is ${level} and the core topics are ${topics.join(', ')}.
-                
-                You must return a single, raw JSON object that conforms EXACTLY to this structure. DO NOT include any explanatory text, markdown, or preamble/postamble outside of the JSON block.
-
-                JSON Structure:
-                {
-                    "grades": [
-                        {
-                            "index": "The original assignment index.",
-                            "grade": "A single letter grade: A, B, C, D, or F.",
-                            "percentage": "A numeric percentage score (0-100).",
-                            "comment": "A concise comment (10-20 words) summarizing the performance."
-                        }
-                        // ... one object for each assignment to grade
-                    ]
-                }
-            `;
-            
-            const userQuery = `Grade the following student responses. The assignments are of type: ${gradedAssignments.map(g => g.type).join(', ')}.
-            
-            ${gradedAssignments.map(g => 
-                `--- Assignment Index ${g.index} (${g.type} - ${g.title}) ---\nPrompt:\n${g.prompt}\n\nStudent Response:\n${g.userResponse}\n`
-            ).join('\n\n')}
-            `;
-
-            try {
-                const payload = {
-                    model: ANTHROPIC_MODEL,
-                    messages: [
-                        { role: "user", content: userQuery }
-                    ],
-                    max_tokens: 2048,
-                    temperature: 0.1,
-                    // Anthropic uses this header for JSON output control
-                    headers: { 'Anthropic-Version': '2023-06-01', 'Content-Type': 'application/json' },
-                    response_format: { type: "json_object" }
-                };
-
-                const apiResponse = await callAnthropicApi(payload);
-                const textPart = apiResponse.content[0].text;
-                const responseJson = JSON.parse(textPart);
-
-                if (!Array.isArray(responseJson.grades)) {
-                    throw new Error("Anthropic response did not contain the expected 'grades' array.");
-                }
-
-                appState.anthropicGrading = {}; // Reset
-                responseJson.grades.forEach(g => {
-                    appState.anthropicGrading[g.index] = {
-                        grade: g.grade,
-                        percentage: g.percentage,
-                        comment: g.comment
-                    };
-                });
-            } catch (error) {
-                console.error("Anthropic Grading Error:", error);
-                throw new Error(`Anthropic grading failed: ${error.message}`);
-            }
-        }
-
-
-        // MODIFIED: Grading Function to support new array-based answers AND Anthropic grading
-        async function gradeAssignments() {
+        // MODIFIED: Grading Function to support new array-based answers
+        function gradeAssignments() {
             let correctCount = 0;
             let totalGradable = 0;
             let finalAssignmentText = '';
-            
-            const assignmentsToGradeByAnthropic = [];
 
-            // 1. Collect written assignments for Anthropic grading
-            appState.generatedAssignments.forEach((assignment, index) => {
-                const type = assignment.type;
-                const userAnswer = appState.userAnswers[index]?.answer;
-
-                if (type === 'WritingPrompt' || type === 'VocabularyWords') {
-                    // For vocab, combine all sentences into one string for the grader
-                    const userResponse = Array.isArray(userAnswer) ? userAnswer.filter(Boolean).join('\n') : userAnswer || '';
-                    assignmentsToGradeByAnthropic.push({
-                        assignment,
-                        index,
-                        userResponse,
-                    });
-                }
-            });
-
-            // 2. Call Anthropic API for written assignments asynchronously
-            if (assignmentsToGradeByAnthropic.length > 0) {
-                try {
-                    const topicNames = appState.selectedTopicIds.map(id => TOPIC_POOL.find(t => t.id === id)?.name).filter(Boolean);
-                    await gradeWrittenAssignments(assignmentsToGradeByAnthropic, topicNames, appState.cefrLevel);
-                } catch (error) {
-                    // Use a fallback state if Anthropic grading fails
-                    console.error("Failing gracefully: Anthropic grading step failed. Proceeding with auto-grading only.");
-                }
-            }
-
-
-            // 3. Process all assignments for display/summary
             appState.generatedAssignments.forEach((assignment, index) => {
                 const userAnswer = appState.userAnswers[index]?.answer; // This can be a string OR an array
                 const feedbackElement = getElement(`feedback-${index}`);
                 const cardElement = getElement(`assignment-card-${index}`);
                 const type = assignment.type;
-                const anthropicResult = appState.anthropicGrading[index];
 
                 // Reset state
                 feedbackElement.classList.add('hidden');
                 feedbackElement.className = 'text-sm mt-4 p-3 rounded-lg border-l-4'; 
                 
-                // MC grading logic
+                // MODIFIED (Instruction 4): New MC grading logic
                 if (type === 'MultipleChoice' && assignment.questions) {
                     let correctInBlock = 0;
                     const userAnswerArray = userAnswer || [];
@@ -1073,6 +964,7 @@
                         let isCorrect = false;
 
                         if (userChoice !== undefined && userChoice !== null) {
+                            // Check if the user selected a valid index
                             isCorrect = parseInt(userChoice) === correctIndex;
                             if (isCorrect) {
                                 correctInBlock++;
@@ -1084,7 +976,7 @@
                         const selectedText = (userChoice !== undefined && userChoice !== null) ? mcq.options[parseInt(userChoice)] : 'N/A';
                         mcqFinalText += `  Q${mcqIndex + 1}: ${mcq.question_text}\n  Your Answer: ${selectedText}\n  Correct Answer: ${mcq.options[correctIndex]}\n  Result: ${isCorrect ? 'Correct' : 'Incorrect'}\n\n`;
                         
-                        // New feedback text for Step 4
+                        // MODIFIED (Instruction 4): New feedback text for Step 4
                         if (isCorrect) {
                             mcqFeedbackText += `<p class="text-sm text-green-600">Q${mcqIndex + 1}: Correct!</p>`;
                         } else if (userChoice === undefined || userChoice === null) {
@@ -1104,7 +996,7 @@
 
                     finalAssignmentText += `--- ${assignment.title} (Multiple Choice) ---\n${mcqFinalText}`;
 
-                // Grammar grading logic
+                // MODIFIED & FIXED: New Grammar grading logic with robust cleaning
                 } else if (type === 'GrammarPractice' && Array.isArray(assignment.correctAnswer)) {
                     let correctInBlock = 0;
                     const userAnswerArray = userAnswer || [];
@@ -1116,11 +1008,12 @@
                     let grammarFeedbackText = ''; // Text for Step 4 feedback
                     
                     expectedAnswerArray.forEach((expectedAns, ansIndex) => {
-                        const userAns = (userAnswerArray[ansIndex] || "").trim().toLowerCase();
-                        const correctAns = expectedAns.trim().toLowerCase();
+                        // FIX: Use robust cleaning for comparison
+                        const userAnsCleaned = cleanAndNormalize(userAnswerArray[ansIndex]);
+                        const correctAnsCleaned = cleanAndNormalize(expectedAns);
                         let isCorrect = false;
 
-                        if (userAns === correctAns) {
+                        if (userAnsCleaned === correctAnsCleaned && userAnsCleaned !== '') {
                             correctInBlock++;
                             correctCount++;
                             isCorrect = true;
@@ -1131,7 +1024,7 @@
                         // New feedback text for Step 4
                         if (isCorrect) {
                             grammarFeedbackText += `<p class="text-sm text-green-600">Q${ansIndex + 1}: Correct!</p>`;
-                        } else if (!userAnswerArray[ansIndex]) {
+                        } else if (userAnsCleaned === '') { // FIX: Check for empty/skipped answer using the cleaned string
                             grammarFeedbackText += `<p class="text-sm text-yellow-600">Q${ansIndex + 1}: Skipped. Correct was: "${expectedAns}"</p>`;
                         } else {
                             grammarFeedbackText += `<p class="text-sm text-red-600">Q${ansIndex + 1}: Incorrect. Correct was: "${expectedAns}"</p>`;
@@ -1149,38 +1042,20 @@
                     finalAssignmentText += `--- ${assignment.title} (Grammar) ---\n${grammarFinalText}\n`;
 
                 } else {
-                    // WritingPrompt/VocabularyWords (Anthropic Graded or Ungraded Fallback)
+                    // WritingPrompt/VocabularyWords (Ungraded)
                     let userResponseText = '';
-                    let feedbackMessage = '';
-                    
                     if (type === 'VocabularyWords' && Array.isArray(userAnswer)) {
                         userResponseText = userAnswer.filter(Boolean).join('\n');
                     } else if (type === 'WritingPrompt') {
                         userResponseText = userAnswer || '';
                     }
-                    
-                    // INSTRUCTION 3: Incorporate Anthropic grading feedback
-                    if (anthropicResult) {
-                        feedbackMessage = `
-                            <p class="font-bold text-lg mb-1">Anthropic Grade: <span class="text-indigo-700">${anthropicResult.grade} (${anthropicResult.percentage}%)</span></p>
-                            <p class="text-gray-700">Comment: ${anthropicResult.comment}</p>
-                        `;
-                        feedbackElement.classList.add('bg-indigo-100', 'text-indigo-800', 'border-indigo-400');
-                    } else {
-                        feedbackMessage = "📝 This is a long-form assignment. Anthropic grading failed or was skipped. Review your response below.";
-                        feedbackElement.classList.add('bg-gray-100', 'text-gray-600', 'border-gray-400');
-                    }
 
-                    feedbackElement.innerHTML = feedbackMessage;
+                    feedbackElement.textContent = "📝 This is a long-form assignment and is not automatically graded in this prototype. Review your response below.";
+                    feedbackElement.classList.add('bg-gray-100', 'text-gray-600', 'border-gray-400');
                     feedbackElement.classList.remove('hidden');
                     
                     // Prepare final text: Include Prompt and User Response
-                    finalAssignmentText += `--- ${assignment.title} (${type}) ---\nPrompt:\n${assignment.content}\n\nUser Response:\n${userResponseText}\n\n`;
-                    if (anthropicResult) {
-                        finalAssignmentText += `Anthropic Grade: ${anthropicResult.grade} (${anthropicResult.percentage}%), Comment: ${anthropicResult.comment}\n\n`;
-                    } else {
-                        finalAssignmentText += `(Anthropic Grading Failed/Skipped)\n\n`;
-                    }
+                    finalAssignmentText += `--- ${assignment.title} (${type}) ---\nPrompt:\n${assignment.content}\n\nUser Response:\n${userResponseText}\n\n(Ungraded)\n\n`;
                 }
             });
 
@@ -1191,9 +1066,9 @@
             
             if (totalGradable > 0) {
                  const percentage = Math.round((correctCount / totalGradable) * 100);
-                 getElement('grading-message').textContent = `You scored ${percentage}% on the automatically graded questions (MC/Grammar). Review the detailed feedback above for all assignments!`;
+                 getElement('grading-message').textContent = `You scored ${percentage}% on the automatically graded questions. Review the detailed feedback above for each question!`;
             } else {
-                 getElement('grading-message').textContent = `No automatically gradable questions were generated. The scores for all assignments are provided by the Anthropic AI.`;
+                 getElement('grading-message').textContent = `No automatically gradable questions were generated. Your score is based on questions of type Multiple Choice and Grammar Practice.`;
             }
 
             // Update final text for Step 5
@@ -1228,100 +1103,8 @@
         }
 
         // =====================================================================================================
-        // OPENAI & ANTHROPIC API INTEGRATION LOGIC
+        // OPENAI API INTEGRATION LOGIC (UPDATED FOR NEW FORMATS AND ANSWERS)
         // =====================================================================================================
-
-        // MODIFIED: Single function for Anthropic API Calls
-        async function callAnthropicApi(payload) {
-            const maxRetries = 3;
-
-            for (let attempt = 0; attempt < maxRetries; attempt++) {
-                try {
-                    const response = await fetch(ANTHROPIC_URL, {
-                        method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'X-Api-Key': ANTHROPIC_API_KEY, // Use the Anthropic-specific header
-                            'Anthropic-Version': '2023-06-01' // Required Anthropic-Version header
-                        },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (response.status === 401) {
-                        throw new Error("Unauthorized (401). Please check if your Anthropic API Key is valid and correctly entered.");
-                    }
-                    if (!response.ok) {
-                        const errorBody = await response.json();
-                        console.error(`Anthropic Attempt ${attempt + 1} failed:`, errorBody);
-                        throw new Error(`Anthropic API error: ${response.status} - ${errorBody.error?.message || 'Unknown error'}`);
-                    }
-
-                    const result = await response.json();
-                    return result;
-
-                } catch (error) {
-                    if (attempt < maxRetries - 1) {
-                        const delay = Math.pow(2, attempt) * 2000; // Exponential backoff (2s, 4s, 8s)
-                        await new Promise(resolve => setTimeout(resolve, delay));
-                    } else {
-                        // Throw final error if max retries reached
-                        throw new Error(`Failed to communicate with Anthropic after ${maxRetries} attempts. Details: ${error.message}`);
-                    }
-                }
-            }
-        }
-
-
-        // INSTRUCTION 2: Function to perform Anthropic Quality Check
-        async function qualityCheckAssignments(assignments, topics, formats, level) {
-            const assignmentsString = JSON.stringify(assignments, null, 2);
-            
-            const systemPrompt = `You are an expert English curriculum designer. Your task is to perform a quality check on the provided JSON array of assignments generated by another LLM.
-            Your assessment must rigorously check three criteria:
-            1. **Topic Correlation:** How well do the assignments use the core topics (${topics.join(', ')})?
-            2. **Format Adherence:** Do the assignments conform to the requested types (${formats.map(f => f.type).join(', ')}) and structures?
-            3. **Difficulty Accuracy:** Is the complexity of the language, vocabulary, and concepts appropriate for the CEFR level (${level})?
-
-            If the assignments pass all checks, return a single, raw JSON object: {"qc_pass": true, "reason": "Assignments are high quality."}.
-            If they fail any check, return: {"qc_pass": false, "reason": "A brief explanation (20-30 words) of the most significant failing (e.g., 'Difficulty is too high for A1.' or 'Topics were barely mentioned.')."}
-            
-            DO NOT include any explanatory text, markdown, or preamble/postamble outside of the JSON block.
-            `;
-            
-            const userQuery = `Review the following assignments against the criteria:
-            Requested Topics: ${topics.join(', ')}
-            Requested Formats: ${formats.map(f => f.name).join(', ')}
-            Requested Level: ${level}
-
-            Assignments JSON:\n${assignmentsString}
-            `;
-
-            try {
-                const payload = {
-                    model: ANTHROPIC_MODEL,
-                    messages: [
-                        { role: "user", content: userQuery }
-                    ],
-                    max_tokens: 512,
-                    temperature: 0.1,
-                    headers: { 'Anthropic-Version': '2023-06-01', 'Content-Type': 'application/json' },
-                    response_format: { type: "json_object" }
-                };
-
-                const apiResponse = await callAnthropicApi(payload);
-                const textPart = apiResponse.content[0].text;
-                const responseJson = JSON.parse(textPart);
-
-                return responseJson;
-
-            } catch (e) {
-                console.error("Anthropic QC Call Failed:", e);
-                // Fail safe: If QC call fails, assume a soft pass to not block the user, 
-                // but log the error. We must return a valid QC object.
-                return { qc_pass: true, reason: "QC failed to connect, proceeding with caution." };
-            }
-        }
-
 
         function buildOpenAIPayload(appState) {
             const level = appState.cefrLevel;
@@ -1360,7 +1143,7 @@
                 {
                   "title": "A concise title for the assignment.",
                   "type": "The exact assignment type, MUST be one of: ${formatTypes.join(', ')}",
-                  "content": "The full instructions/body text for WritingPrompt OR the 5 sentences for GrammarPractice (separated by \\n) OR the list of words for VocabularyWords (first line instruction, subsequent lines word/definition).",
+                  "content": "The full instructions/body text for WritingPrompt OR the 5 sentences for GrammarPractice (separated by \\n) OR the list of words for VocabularyWords.",
                   "question": "The main instruction text for MultipleChoice OR GrammarPractice (e.g., 'Choose the best option.' or 'Fill in the blanks.').",
                   "correctAnswer": "An array of 5 correct answer strings for GrammarPractice (e.g., ["is", "are", "was", "were", "been"]). Null otherwise.",
                   
@@ -1378,7 +1161,7 @@
             
             Specific content rules:
             - WritingPrompt: Use 'content' for the prompt. Set all other fields to null.
-            - VocabularyWords: Use 'content' for the prompt AND the list of words. The first line is the prompt, subsequent lines are the words (e.g., "Use these words in a sentence:\\n1. Word (n): Definition...\\n2. Word (v): Definition..."). Set 'correctAnswer' and 'questions' to null.
+            - VocabularyWords: Use 'content' for the prompt AND the list of words. The first line is the prompt, subsequent lines are the words (e.g., "Use these words in a sentence:\\n1. Word (n): Definition...\\n2. Word (v): Definition..."). Set all other fields to null.
             - GrammarPractice: Use 'question' for the main instruction (e.g., "Complete the sentences..."). Use 'content' for the 5 sentences, each separated by \\n and containing a '___' blank. Use 'correctAnswer' for an array of 5 correct strings. Set 'questions' to null.
             - MultipleChoice: Use 'question' for the main instruction (e.g., "Read and choose..."). Use the 'questions' array to provide 5 individual multiple-choice questions, each with 'question_text', 'options', and 'correctAnswerIndex'. Set 'content' and 'correctAnswer' to null.
             `;
@@ -1471,32 +1254,16 @@
         }
 
         async function generateAssignments() {
-            const topicNames = appState.selectedTopicIds.map(id => TOPIC_POOL.find(t => t.id === id)?.name).filter(Boolean);
-            const selectedFormats = appState.selectedFormatIds.map(id => FORMAT_POOL.find(f => f.id === id)).filter(Boolean);
-
             try {
-                // --- Step 1: OpenAI Generation ---
-                getElement('loading-message').textContent = "OpenAI is creating the assignments. This may take up to 30 seconds.";
                 const payload = buildOpenAIPayload(appState);
+
+                // 1. Call the real OpenAI API
                 const apiResponse = await callOpenAIApi(payload);
+
+                // 2. Process the real response (which should be a structured JSON array)
                 appState.generatedAssignments = processGeneratedText(apiResponse);
 
-
-                // --- Step 2: Anthropic Quality Check (INSTRUCTION 2) ---
-                getElement('loading-message').textContent = "Anthropic AI is double-checking the assignments for quality and adherence...";
-                
-                const qcResult = await qualityCheckAssignments(
-                    appState.generatedAssignments, 
-                    topicNames, 
-                    selectedFormats, 
-                    appState.cefrLevel
-                );
-
-                if (qcResult.qc_pass === false) {
-                    throw new Error(`Quality Check Failed: ${qcResult.reason}`);
-                }
-                
-                // --- Step 3: Display Results ---
+                // 3. Display the real results
                 displayAssignments();
 
             } catch (error) {
@@ -1504,7 +1271,7 @@
                 
                 // Show the error message to the user
                 const errorMessageElement = getElement('error-message');
-                errorMessageElement.textContent = `Assignment generation or quality check failed: ${error.message}. Please check your API keys or try different criteria.`;
+                errorMessageElement.textContent = `The OpenAI API call failed: ${error.message}. Please check your API key, network connection, or try less complex criteria.`;
                 getElement('generation-error').classList.remove('hidden');
 
                 // Clear any old assignments
@@ -1522,9 +1289,9 @@
 
         async function startGeneration() {
             // Check for API Key just before starting generation
-            if (!API_KEY || !ANTHROPIC_API_KEY) {
+            if (!API_KEY) {
                 // Using a custom message box instead of alert()
-                getElement('error-message').textContent = "Please enter BOTH your OpenAI and Anthropic API Keys in Step 1 to continue.";
+                getElement('error-message').textContent = "Please enter your OpenAI API Key in Step 1 to continue.";
                 getElement('generation-error').classList.remove('hidden');
                 showStep(1);
                 return;
@@ -1561,23 +1328,13 @@
 
             // Set up API Key listener (Step 1)
             const apiKeyInput = getElement('openai-api-key');
-            const anthropicKeyInput = getElement('anthropic-api-key');
             const nextButtonStep1 = getElement('step-1-next');
 
             apiKeyInput.addEventListener('input', updateButtonStates);
-            anthropicKeyInput.addEventListener('input', updateButtonStates); // INSTRUCTION 1: New listener
             nextButtonStep1.addEventListener('click', () => showStep(2));
             
             // NEW: Add Enter key functionality for Step 1
             apiKeyInput.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter') {
-                    if (!nextButtonStep1.disabled) {
-                        event.preventDefault(); 
-                        nextButtonStep1.click();
-                    }
-                }
-            });
-            anthropicKeyInput.addEventListener('keydown', (event) => {
                 if (event.key === 'Enter') {
                     if (!nextButtonStep1.disabled) {
                         event.preventDefault(); 
