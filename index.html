@@ -433,22 +433,6 @@
             return format ? format.name : type;
         }
 
-        /**
-         * FIX: Robustly cleans and normalizes strings for case-insensitive and whitespace-tolerant comparison.
-         * This helps fix grading flaws where invisible characters or extra spaces cause mismatches.
-         * For Grammar Practice (one-word answers), this removes punctuation for better matching.
-         */
-        function cleanAndNormalize(str) {
-            if (typeof str !== 'string' || str === null) return '';
-            
-            // 1. Convert to string, replace non-word characters with a single space, and remove all underscores
-            // This is slightly aggressive but necessary to handle subtle LLM output errors
-            let cleaned = str.replace(/[^a-zA-Z0-9\s]/g, ' '); 
-            
-            // 2. Reduce multiple spaces to single space, trim, and convert to lower case
-            return cleaned.replace(/\s+/g, ' ').trim().toLowerCase();
-        }
-
         function showStep(stepNumber) {
             appState.currentStep = stepNumber;
             document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
@@ -739,7 +723,7 @@
                     appState.userAnswers[assignmentIndex].answer[subIndex] = inputElement.value; // Store index
                     // No visual feedback needed for plain radio buttons
                 } else {
-                    appState.userAnswers[assignmentIndex].answer[subIndex] = inputElement.value; // Store text (don't trim here, do it on grading)
+                    appState.userAnswers[assignmentIndex].answer[subIndex] = inputElement.value; // Store raw text, letting grade function handle trim/lowerCase
                 }
                 return; // Skip other logic
             }
@@ -948,6 +932,8 @@
                 feedbackElement.classList.add('hidden');
                 feedbackElement.className = 'text-sm mt-4 p-3 rounded-lg border-l-4'; 
                 
+                // MODIFIED (Instruction 4): No more tile UI to clear
+                
                 // MODIFIED (Instruction 4): New MC grading logic
                 if (type === 'MultipleChoice' && assignment.questions) {
                     let correctInBlock = 0;
@@ -964,7 +950,6 @@
                         let isCorrect = false;
 
                         if (userChoice !== undefined && userChoice !== null) {
-                            // Check if the user selected a valid index
                             isCorrect = parseInt(userChoice) === correctIndex;
                             if (isCorrect) {
                                 correctInBlock++;
@@ -996,7 +981,7 @@
 
                     finalAssignmentText += `--- ${assignment.title} (Multiple Choice) ---\n${mcqFinalText}`;
 
-                // MODIFIED & FIXED: New Grammar grading logic with robust cleaning
+                // MODIFIED (Instruction 2): New Grammar grading logic (FIXED)
                 } else if (type === 'GrammarPractice' && Array.isArray(assignment.correctAnswer)) {
                     let correctInBlock = 0;
                     const userAnswerArray = userAnswer || [];
@@ -1004,27 +989,45 @@
                     const totalInBlock = expectedAnswerArray.length;
                     totalGradable += totalInBlock;
 
-                    let grammarFinalText = `Prompt: ${assignment.content.replace(/\n/g, '\n  ')}\n`;
+                    let grammarFinalText = `Prompt: ${assignment.question || assignment.content}\n`;
                     let grammarFeedbackText = ''; // Text for Step 4 feedback
                     
                     expectedAnswerArray.forEach((expectedAns, ansIndex) => {
-                        // FIX: Use robust cleaning for comparison
-                        const userAnsCleaned = cleanAndNormalize(userAnswerArray[ansIndex]);
-                        const correctAnsCleaned = cleanAndNormalize(expectedAns);
+                        // FIX: Use optional chaining and default to empty string for safety
+                        const userAnsRaw = userAnswerArray[ansIndex] || ""; 
+                        
+                        // Normalizing for comparison
+                        const userAns = userAnsRaw.trim().toLowerCase();
+                        const correctAns = expectedAns.trim().toLowerCase();
                         let isCorrect = false;
 
-                        if (userAnsCleaned === correctAnsCleaned && userAnsCleaned !== '') {
+                        // Check for direct match
+                        if (userAns === correctAns) {
+                            isCorrect = true;
+                        } else {
+                            // Secondary Check: Handle common single-word variations if necessary
+                            // NOTE: This complex logic is left out as it's hard to generalize. 
+                            // The primary fix is to ensure the trim().toLowerCase() comparison is robust.
+                            // The original code was correct for exact match, so the issue was likely
+                            // with spaces in the stored user input, which `handleUserAnswer` was 
+                            // *no longer* trimming.
+
+                            // Reverting user answer saving to NOT trim in handleUserAnswer, but 
+                            // ensuring the input box value is retrieved/saved.
+                        }
+
+
+                        if (isCorrect) {
                             correctInBlock++;
                             correctCount++;
-                            isCorrect = true;
                         }
                         
-                        grammarFinalText += `  Q${ansIndex + 1}: Your Answer: "${userAnswerArray[ansIndex] || 'N/A'}", Correct: "${expectedAns}", Result: ${isCorrect ? 'Correct' : 'Incorrect'}\n`;
+                        grammarFinalText += `  Q${ansIndex + 1}: Your Answer: "${userAnsRaw}", Correct: "${expectedAns}", Result: ${isCorrect ? 'Correct' : 'Incorrect'}\n`;
                         
                         // New feedback text for Step 4
                         if (isCorrect) {
                             grammarFeedbackText += `<p class="text-sm text-green-600">Q${ansIndex + 1}: Correct!</p>`;
-                        } else if (userAnsCleaned === '') { // FIX: Check for empty/skipped answer using the cleaned string
+                        } else if (!userAnsRaw.trim()) {
                             grammarFeedbackText += `<p class="text-sm text-yellow-600">Q${ansIndex + 1}: Skipped. Correct was: "${expectedAns}"</p>`;
                         } else {
                             grammarFeedbackText += `<p class="text-sm text-red-600">Q${ansIndex + 1}: Incorrect. Correct was: "${expectedAns}"</p>`;
