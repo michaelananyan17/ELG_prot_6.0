@@ -1,316 +1,682 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PELE - Personalized English Learning Experience (Claude-Integrated)</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
-    body {
-      font-family: "Inter", sans-serif;
-      background-color: #f7f9fc;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      padding: 2rem 1rem;
-    }
-    .app-container {
-      background-color: #ffffff;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-      max-width: 4xl;
-      width: 100%;
-      border-radius: 1rem;
-      padding: 2rem 1.5rem;
-    }
-    .card-topic,
-    .card-format {
-      cursor: pointer;
-      transition: all 0.3s ease-in-out;
-      user-select: none;
-      border: 3px solid transparent;
-      background-color: #ffffff;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      position: relative;
-    }
-    .card-topic:hover,
-    .card-format:hover {
-      box-shadow: 0 5px 20px rgba(79, 70, 229, 0.2);
-    }
-    .card-topic.selected,
-    .card-format.selected {
-      border-color: #4f46e5;
-      background-color: #eef2ff;
-      box-shadow: 0 5px 20px rgba(79, 70, 229, 0.3);
-    }
-    .priority-number {
-      position: absolute;
-      top: -10px;
-      right: -10px;
-      width: 24px;
-      height: 24px;
-      background-color: #4f46e5;
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: bold;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
-    .slider-thumb::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: #4f46e5;
-      cursor: pointer;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-      margin-top: -8px;
-    }
-    .slider-thumb::-moz-range-thumb {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: #4f46e5;
-      cursor: pointer;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-    }
-    .spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #4f46e5;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% {
-        transform: rotate(0deg);
-      }
-      100% {
-        transform: rotate(360deg);
-      }
-    }
-    .assignment-block {
-      border-left: 5px solid;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-      border-radius: 0.5rem;
-      background-color: #fff;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    }
-    .block-order-1 {
-      border-color: #f59e0b;
-      background-color: #fffbeb;
-    }
-    .block-order-2 {
-      border-color: #10b981;
-      background-color: #ecfdf5;
-    }
-    .block-order-3 {
-      border-color: #4f46e5;
-      background-color: #eef2ff;
-    }
-    .block-order-4 {
-      border-color: #84c3be;
-      background-color: #f0fafa;
-    }
-    .input-style {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #d1d5db;
-      border-radius: 0.5rem;
-      resize: vertical;
-      font-size: 1rem;
-      transition: all 0.2s;
-    }
-    .input-style:focus {
-      border-color: #4f46e5;
-      box-shadow: 0 0 0 3px #c7d2fe;
-      outline: none;
-    }
-    .grammar-input {
-      border: 1px solid #ccc;
-      padding: 4px 6px;
-      border-radius: 4px;
-      text-align: center;
-      font-weight: 600;
-      color: #1e40af;
-      flex: 1 1 auto;
-      min-width: 100px;
-      max-width: 250px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PELE - Personalized English Learning Experience (Functional)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fc;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+        .app-container {
+            background-color: #ffffff;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            max-width: 4xl;
+            width: 100%;
+            border-radius: 1rem;
+            padding: 2rem 1.5rem;
+        }
+
+        /* --- Step 1/2 Styling (UPDATED from prot_2) --- */
+        .card-topic, .card-format {
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            user-select: none;
+            border: 3px solid transparent;
+            background-color: #ffffff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            /* Important for absolute positioning of priority number */
+            position: relative; 
+        }
+        .card-topic:hover, .card-format:hover {
+            box-shadow: 0 5px 20px rgba(79, 70, 229, 0.2);
+        }
+        .card-topic.selected, .card-format.selected {
+            border-color: #4f46e5; /* Indigo-600 */
+            background-color: #eef2ff; /* Indigo-50 */
+            box-shadow: 0 5px 20px rgba(79, 70, 229, 0.3);
+        }
+        
+        /* Priority number style for selected topic cards */
+        .priority-number {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 24px;
+            height: 24px;
+            background-color: #4f46e5;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* --- Step 3 Styling (CEFR Slider) --- */
+        .slider-thumb::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4f46e5; /* Indigo-600 */
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            margin-top: -8px; /* Center the thumb vertically */
+        }
+        .slider-thumb::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* === START: STEP 4 STYLES FROM PROT_4 === */
+        .assignment-block { 
+            border-left: 5px solid; 
+            padding: 1.5rem; 
+            margin-bottom: 2rem; 
+            border-radius: 0.5rem; 
+            background-color: #fff; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); 
+        }
+        
+        /* Step 4: NEW Sidebar Colors based on order */
+        .block-order-1 { border-color: #f59e0b; background-color: #fffbeb; } /* Orange */
+        .block-order-2 { border-color: #10b981; background-color: #ecfdf5; } /* Green */
+        .block-order-3 { border-color: #4f46e5; background-color: #eef2ff; } /* Blue */
+        /* MODIFIED (Instruction 5): Added 4th color */
+        .block-order-4 { border-color: #84C3BE; background-color: #f0fafa; } /* New Teal */
+
+
+        .input-style { 
+            width: 100%; 
+            padding: 0.75rem; 
+            border: 1px solid #d1d5db; 
+            border-radius: 0.5rem; 
+            resize: vertical; 
+            font-size: 1rem; 
+            transition: all 0.2s; 
+        }
+        .input-style:focus { 
+            border-color: #4f46e5; 
+            box-shadow: 0 0 0 3px #c7d2fe; 
+            outline: none; 
+        }
+        
+        .grammar-input {
+            border: 1px solid #ccc;
+            padding: 4px 6px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: 600;
+            color: #1e40af;
+            /* MODIFIED from prot_4: Let flexbox handle the width */
+            flex: 1 1 auto;
+            min-width: 100px;
+            max-width: 250px;
+        }
+        /* === END: STEP 4 STYLES FROM PROT_4 === */
+
+
+        /* MODIFIED (Instruction 4): Removing MC tile styles as they are no longer used */
+    </style>
 </head>
 <body class="p-4 sm:p-8">
-  <div class="app-container">
-    <div id="header-section" class="mb-8 text-center">
-      <h1 class="text-3xl font-extrabold text-gray-900 mb-2">PELE Assignment Generator</h1>
-      <p class="text-gray-500">Powered by OpenAI + ClaudeAI</p>
+    <div class="app-container">
+        <div id="header-section" class="mb-8">
+            <h1 class="text-3xl font-extrabold text-gray-900 mb-2 text-center">PELE Assignment Generator</h1>
+            <p class="text-gray-500 text-center">Powered by OpenAI & ClaudeAI</p>
+        </div>
+
+        <div class="mb-8">
+            <div class="relative pt-1">
+                <div class="flex mb-2 items-center justify-between">
+                    <div class="text-right">
+                        <span id="progress-text" class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-indigo-600 bg-indigo-200">
+                            Step 1: Get Started
+                        </span>
+                    </div>
+                </div>
+                <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-indigo-200">
+                    <div id="progress-bar" style="width: 25%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-indigo-600 transition-all duration-500"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="step-1" class="step-content">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Welcome! Let's Get Set Up.</h2>
+            <div class="p-6 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg mb-6">
+                <h3 class="font-bold text-yellow-800 mb-2">Important: API Keys Required</h3>
+                <p class="text-sm text-yellow-700">To generate assignments and grade responses, you need API keys for both OpenAI and ClaudeAI.</p>
+            </div>
+
+            <div class="mb-6">
+                <label for="openai-api-key" class="block text-sm font-medium text-gray-700 mb-2">OpenAI API Key</label>
+                <input type="text" id="openai-api-key" placeholder="Paste your OpenAI API key here (starts with 'sk-...')" 
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out">
+            </div>
+
+            <div class="mb-6">
+                <label for="claudeai-api-key" class="block text-sm font-medium text-gray-700 mb-2">ClaudeAI API Key</label>
+                <input type="text" id="claudeai-api-key" placeholder="Paste your ClaudeAI API key here" 
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out">
+            </div>
+
+            <div class="mt-8 flex justify-end">
+                <button id="step-1-next" class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-150 ease-in-out disabled:opacity-50" disabled>
+                    Next: Topic Selection →
+                </button>
+            </div>
+        </div>
+
+
+        <div id="step-2" class="step-content hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Step 2: Choose Your Topic</h2>
+                <input type="file" id="upload-topic-input" accept=".txt,.pdf" class="hidden">
+                <button id="upload-topic-btn" class="flex items-center px-4 py-2 text-indigo-600 border border-indigo-600 rounded-lg font-semibold hover:bg-indigo-50 transition duration-150 ease-in-out">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    Upload Topic
+                </button>
+            </div>
+
+            <p class="text-gray-600 mb-4">Select **1 or 2 topics**. The order of selection determines the priority for content generation.</p>
+
+            <div class="flex gap-2 mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                <input type="text" id="custom-topic-text" placeholder="Search a custom topic or keyword..." 
+                       class="flex-grow p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out">
+                <button id="select-custom-topic-btn" class="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-150 ease-in-out disabled:opacity-50" disabled>
+                    Select
+                </button>
+            </div>
+            
+            <p id="selected-topics-indicator" class="text-sm font-medium text-gray-700 mb-6">Selected Topics (Priority Order): None</p>
+
+            <div id="topic-cards" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+                </div>
+
+
+            <div class="flex justify-between mt-8">
+                <button id="step-2-back" class="px-6 py-3 text-gray-600 border border-gray-400 rounded-lg font-semibold hover:bg-gray-100 transition duration-150 ease-in-out">
+                    ← Back to API Setup
+                </button>
+                <button id="step-2-next" class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-150 ease-in-out disabled:opacity-50" disabled>
+                    Next: Assignment Type →
+                </button>
+            </div>
+        </div>
+
+        <div id="step-3" class="step-content hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Step 3: Format & Difficulty</h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Assignment Format</h3>
+                    <div id="format-cards" class="grid grid-cols-2 gap-4">
+                        </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Difficulty Level (CEFR)</h3>
+                    
+                    <div class="p-6 bg-indigo-50 rounded-lg shadow-inner">
+                        <div class="flex justify-between text-sm font-medium text-indigo-700 mb-4">
+                            <span id="cefr-display" class="text-2xl font-bold">A1</span>
+                            <span id="level-description-short" class="mt-1">Beginner</span>
+                        </div>
+                        <input type="range" min="1" max="6" value="3" id="cefr-slider" 
+                               class="w-full h-2 bg-indigo-300 rounded-lg appearance-none cursor-pointer slider-thumb">
+                        <div class="flex justify-between text-xs mt-2 text-indigo-700 font-medium">
+                            <span>A1</span>
+                            <span>A2</span>
+                            <span>B1</span>
+                            <span>B2</span>
+                            <span>C1</span>
+                            <span>C2</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <div id="description-toggle-header" class="flex items-center justify-between cursor-pointer p-3 rounded-lg bg-gray-100 hover:bg-gray-200 transition">
+                            <span class="font-medium text-gray-700">What does this level mean?</span>
+                            <span id="toggle-icon" class="text-gray-500 transform transition-transform duration-300">▼</span>
+                        </div>
+                        <div id="level-description-full" class="p-4 bg-white border border-t-0 rounded-b-lg text-sm text-gray-600 hidden">
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between mt-8">
+                <button id="step-3-back" class="px-6 py-3 text-indigo-600 border border-indigo-600 rounded-lg font-semibold hover:bg-indigo-50 transition duration-150 ease-in-out">
+                    Back (Step 2)
+                </button>
+                <button id="step-3-next-generate" class="px-8 py-3 bg-green-600 text-white font-bold rounded-lg shadow-xl hover:bg-green-700 transition duration-150 ease-in-out disabled:opacity-50" disabled>
+                    Generate Assignments
+                </button>
+            </div>
+        </div>
+
+        <div id="step-4" class="step-content hidden">
+            
+            <header class="text-center mb-10">
+                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Personalized English Learning</h1>
+                <p id="step-title" class="text-xl font-medium text-indigo-600 mt-2">My Personal Assignment</p>
+                <p class="text-gray-500 mt-1">Topic(s): <span id="final-topic-display" class="font-semibold text-gray-700"></span> | Level: <span id="final-level-display" class="font-semibold text-gray-700"></span></p>
+            </header>
+            
+            <div id="generation-loading" class="text-center p-12 border border-dashed border-gray-300 rounded-lg hidden">
+                <div class="spinner mx-auto mb-4"></div>
+                <p class="text-gray-600 font-semibold text-lg">
+                    Generating your personalized English assignments using the LLM...
+                </p>
+                <p class="text-sm text-gray-500 mt-2">This may take up to 30 seconds depending on the complexity.</p>
+            </div>
+
+            <div id="generation-error" class="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded hidden" role="alert">
+                <p class="font-bold">Generation Failed</p>
+                <p id="error-message" class="text-sm">An unknown error occurred while contacting the LLM.</p>
+            </div>
+
+            <div id="assignments-workspace">
+                </div>
+
+            <div id="no-assignments-message" class="hidden text-center p-10 bg-gray-100 border border-gray-300 rounded-xl">
+                <p class="text-2xl font-bold text-gray-700 mb-2">No Assignments Generated</p>
+                <p class="text-gray-500">Please go back and try different criteria.</p>
+            </div>
+            
+            <div id="grading-summary" class="hidden mt-8 p-6 bg-indigo-50 rounded-lg border border-indigo-200 shadow-md">
+                <h3 class="text-xl font-bold text-indigo-800">Review Summary</h3>
+                <p class="text-lg text-indigo-600 mt-1">Score on Graded Questions: <span id="current-score" class="font-extrabold text-2xl">0/0</span></p>
+                <p id="grading-message" class="text-sm text-indigo-700"></p>
+            </div>
+
+            <div class="flex justify-between mt-8">
+                <div class="space-x-4">
+                    <button id="step-4-back-to-prev" class="px-6 py-3 text-indigo-600 border border-indigo-600 rounded-lg font-semibold hover:bg-indigo-50 transition duration-150 ease-in-out">
+                        Change Criteria
+                    </button>
+                </div>
+                <button id="submit-assignments" class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-150 ease-in-out disabled:opacity-50" disabled>
+                    Grade & Review (Step 5)
+                </button>
+            </div>
+        </div>
+
+        <div id="step-5" class="step-content hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Step 5: Final Review & Export</h2>
+            
+            <div class="p-6 bg-green-50 border-l-4 border-green-400 text-green-700 rounded-lg mb-6">
+                <p class="font-bold">Success!</p>
+                <p class="text-sm">Your real, custom-generated assignments are ready for use. You can now copy or export them.</p>
+            </div>
+
+            <div id="final-review-content" class="p-6 border border-gray-200 rounded-lg bg-white shadow-sm space-y-4">
+                <h3 class="text-xl font-semibold text-gray-700">Assignments Summary</h3>
+                <div id="final-assignment-text" class="whitespace-pre-wrap text-gray-700 text-sm">
+                    </div>
+                <button onclick="copyToClipboard('final-assignment-text')" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg text-sm hover:bg-gray-300 transition duration-150 ease-in-out mt-4">
+                    Copy All Assignments
+                </button>
+            </div>
+
+            <div class="flex justify-between mt-8">
+                <button id="step-5-back-to-prev" class="px-6 py-3 text-indigo-600 border border-indigo-600 rounded-lg font-semibold hover:bg-indigo-50 transition duration-150 ease-in-out">
+                    Back (Step 4)
+                </button>
+                <button id="step-5-back-to-start" class="px-6 py-3 bg-gray-800 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 transition duration-150 ease-in-out">
+                    Finish & Restart
+                </button>
+            </div>
+        </div>
+
     </div>
 
-    <!-- === Step 1: API Keys === -->
-    <div id="step-1" class="step-content">
-      <h2 class="text-2xl font-bold text-gray-800 mb-6">Welcome! Let's Get Set Up.</h2>
-      <div class="p-6 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg mb-6">
-        <h3 class="font-bold text-yellow-800 mb-2">Important: API Keys Required</h3>
-        <p class="text-sm text-yellow-700">
-          To generate and grade assignments, you’ll need keys for both
-          <strong>OpenAI</strong> and <strong>ClaudeAI</strong>.
-        </p>
-      </div>
-      <div class="mb-6">
-        <label for="openai-api-key" class="block text-sm font-medium text-gray-700 mb-2">OpenAI API Key</label>
-        <input
-          type="text"
-          id="openai-api-key"
-          placeholder="Paste your OpenAI key (starts with 'sk-...')"
-          class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out"
-        />
-      </div>
-      <div class="mb-6">
-        <label for="claude-api-key" class="block text-sm font-medium text-gray-700 mb-2">ClaudeAI API Key</label>
-        <input
-          type="text"
-          id="claude-api-key"
-          placeholder="Paste your Claude key (starts with 'sk-ant-...')"
-          class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out"
-        />
-      </div>
-      <div class="mt-8 flex justify-end">
-        <button
-          id="step-1-next"
-          class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-150 ease-in-out disabled:opacity-50"
-          disabled
-        >
-          Next: Topic Selection →
-        </button>
-      </div>
-    </div>
+    <script>
+        // =====================================================================================================
+        // GLOBAL CONFIGURATION & STATE
+        // =====================================================================================================
 
-    <!-- The rest of your multi-step UI (steps 2–5) is unchanged from your original file -->
-    <!-- ... omitted for brevity, identical to your existing code except JS updates below ... -->
-  </div>
+        // IMPORTANT: The user must paste their keys here
+        let OPENAI_API_KEY = '';
+        let CLAUDEAI_API_KEY = '';
+        
+        // API Configuration
+        const OPENAI_MODEL = 'gpt-3.5-turbo-1106'; // A model supporting the JSON mode
+        const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
+        const CLAUDEAI_URL = 'https://api.anthropic.com/v1/messages';
+        const CLAUDEAI_MODEL = 'claude-3-sonnet-20240229';
 
-  <script>
-    // === GLOBAL CONFIG ===
-    let API_KEY = '';
-    let CLAUDE_KEY = '';
-    const CLAUDE_URL = 'https://api.anthropic.com/v1/messages';
-    const OPENAI_MODEL = 'gpt-3.5-turbo-1106';
-    const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
-    const appState = { currentStep: 1, generatedAssignments: [], userAnswers: [] };
+        const appState = {
+            currentStep: 1,
+            selectedTopicIds: [], // Now holds IDs for all selected topics (predefined, custom, or uploaded)
+            selectedFormatIds: [],
+            cefrLevel: 'B1',
+            generatedAssignments: [],
+            userAnswers: [], // Stores the user's answers for each assignment
+            customTopicText: '',
+            uploadedTopic: null, // Stores { id: 'uploaded', name: 'File Name', content: '...' }
+        };
 
-    function getElement(id) {
-      return document.getElementById(id);
-    }
+        const TOPIC_POOL_DATA = [
+            { id: 1, name: 'AI & ML', icon: '🤖', category: 'Technology' },
+            { id: 2, name: 'Climate Change', icon: '🌍', category: 'Science' },
+            { id: 3, name: 'Quantum Physics', icon: '⚛️', category: 'Science' },
+            { id: 4, name: 'The Roman Empire', icon: '🏛️', category: 'History' },
+            { id: 5, name: 'Shakespeare', icon: '🎭', category: 'Literature' },
+            { id: 6, name: 'Biotechnology', icon: '🧬', category: 'Science' },
+            { id: 7, name: 'Ancient Egypt', icon: '☥', category: 'History' },
+            { id: 8, name: 'Cybersecurity', icon: '🔒', category: 'Technology' },
+            { id: 9, name: 'Poetry Analysis', icon: '📜', category: 'Literature' },
+            { id: 10, name: 'World Wars', icon: '⚔️', category: 'History' },
+            { id: 11, name: 'Space Exploration', icon: '🚀', category: 'Science' },
+            { id: 12, name: 'Philosophy', icon: '🧠', category: 'Literature' },
+            { id: 13, name: 'Renewable Energy', icon: '💡', category: 'Technology' },
+            { id: 14, name: 'Economic History', icon: '💰', category: 'History' }
+        ];
+        
+        // This pool will be updated with custom/uploaded topics
+        let TOPIC_POOL = [...TOPIC_POOL_DATA];
+        
+        // ********** MODIFIED FORMAT POOL **********
+        const FORMAT_POOL = [
+            // Note: WritingPrompt is marked as 'Ungraded' for the prototype, as LLM essay grading is complex
+            { id: 'ft1', name: 'English Text Topic', type: 'WritingPrompt', icon: '📝', description: 'Generates a full prompt for an essay or a short story (Ungraded)' },
+            { id: 'ft2', name: 'Grammar Practice', type: 'GrammarPractice', icon: '🧠', description: 'Generates sentences with blanks for conjunction or syntax practice' },
+            { id: 'ft3', name: 'Vocabulary Words', type: 'VocabularyWords', icon: '📚', description: 'Generates new words with context, requiring students to use them in sentences (Ungraded)' },
+            { id: 'ft4', name: 'Multiple Choice', type: 'MultipleChoice', icon: '✅', description: 'Generates questions with four potential answers, with only one correct answer' },
+        ];
+        // *****************************************
 
-    function showStep(n) {
-      document.querySelectorAll('.step-content').forEach(e => e.classList.add('hidden'));
-      getElement(`step-${n}`).classList.remove('hidden');
-      appState.currentStep = n;
-    }
+        const CEFR_LEVELS = {
+            'A1': { short: 'Beginner', full: 'Can understand and use familiar everyday expressions and very basic phrases.' },
+            'A2': { short: 'Elementary', full: 'Can understand sentences and frequently used expressions related to areas of most immediate relevance.' },
+            'B1': { short: 'Intermediate', full: 'Can understand the main points of clear standard input on familiar matters regularly encountered in work, school, leisure, etc.' },
+            'B2': { short: 'Upper Intermediate', full: 'Can understand the main ideas of complex text on both concrete and abstract topics, including technical discussions in their field of specialization.' },
+            'C1': { short: 'Advanced', full: 'Can understand a wide range of demanding, longer texts, and recognize implicit meaning. Can express him/herself fluently and spontaneously.' },
+            'C2': { short: 'Proficiency', full: 'Can understand with ease virtually everything heard or read. Can summarize information from different spoken and written sources.' }
+        };
 
-    // === UPDATE BUTTON STATES ===
-    function updateButtonStates() {
-      const openaiKey = getElement('openai-api-key').value.trim();
-      const claudeKey = getElement('claude-api-key').value.trim();
-      API_KEY = openaiKey;
-      CLAUDE_KEY = claudeKey;
-      getElement('step-1-next').disabled = !(openaiKey && claudeKey);
-    }
 
-    // === CLAUDE GRADING FUNCTION ===
-    async function gradeWrittenAnswerWithClaude(prompt, userAnswer) {
-      if (!CLAUDE_KEY) return { feedback: '⚠️ Claude key missing', score: null };
-      const body = {
-        model: 'claude-3-opus-20240229',
-        max_tokens: 300,
-        messages: [
-          {
-            role: 'user',
-            content: `Grade the following student's English writing from 0–10. Provide 1–2 sentences of feedback.
+        // =====================================================================================================
+        // UTILITY FUNCTIONS
+        // =====================================================================================================
 
-Prompt:
-${prompt}
-
-Student Answer:
-${userAnswer}
-
-Respond in strict JSON as {"score": number, "feedback": "short comment"}.`,
-          },
-        ],
-      };
-      const res = await fetch(CLAUDE_URL, {
-        method: 'POST',
-        headers: {
-          'x-api-key': CLAUDE_KEY,
-          'content-type': 'application/json',
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      try {
-        const txt = data.content?.[0]?.text || '{}';
-        return JSON.parse(txt);
-      } catch {
-        return { feedback: '⚠️ Claude returned non-JSON feedback', score: null };
-      }
-    }
-
-    // === GRADE ASSIGNMENTS ===
-    async function gradeAssignments() {
-      let correctCount = 0;
-      let totalGradable = 0;
-      const gradingPromises = [];
-
-      appState.generatedAssignments.forEach((assignment, index) => {
-        const type = assignment.type;
-        const feedbackEl = getElement(`feedback-${index}`);
-        feedbackEl.classList.remove('hidden');
-        feedbackEl.innerHTML = '';
-
-        if (type === 'WritingPrompt' || type === 'VocabularyWords') {
-          const userAnswer = appState.userAnswers[index]?.answer;
-          if (userAnswer && userAnswer.length > 0) {
-            gradingPromises.push(
-              (async () => {
-                const joined =
-                  typeof userAnswer === 'string' ? userAnswer : userAnswer.join('\n');
-                const claude = await gradeWrittenAnswerWithClaude(
-                  assignment.content,
-                  joined
-                );
-                feedbackEl.innerHTML = `<p class="text-indigo-700 font-medium">ClaudeAI Score: ${
-                  claude.score ?? 'N/A'
-                }/10</p><p class="text-gray-600">${claude.feedback}</p>`;
-              })()
-            );
-          } else {
-            feedbackEl.textContent = 'No answer provided.';
-          }
-        } else {
-          // other grading unchanged
-          feedbackEl.textContent = 'Auto-grading logic here (MC/Grammar)';
+        function getElement(id) {
+            return document.getElementById(id);
         }
-      });
 
-      await Promise.allSettled(gradingPromises);
-      showStep(5);
-    }
+        // NEW HELPER FUNCTION (from prot_4 logic)
+        function formatTypeToName(type) {
+            const format = FORMAT_POOL.find(f => f.type === type);
+            return format ? format.name : type;
+        }
 
-    function init() {
-      getElement('openai-api-key').addEventListener('input', updateButtonStates);
-      getElement('claude-api-key').addEventListener('input', updateButtonStates);
-      getElement('step-1-next').addEventListener('click', () => showStep(2));
-      showStep(1);
-      updateButtonStates();
-    }
-    window.onload = init;
-  </script>
-</body>
-</html>
+        function showStep(stepNumber) {
+            appState.currentStep = stepNumber;
+            document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+            getElement(`step-${stepNumber}`).classList.remove('hidden');
+            updateProgressBar(stepNumber);
+            updateButtonStates();
+        }
+
+        function updateProgressBar(step) {
+            const percentage = step * 25;
+            getElement('progress-bar').style.width = `${percentage}%`;
+            
+            let text = `Step ${step}: `;
+            if (step === 1) text += "Get Started";
+            if (step === 2) text += "Choose Topic";
+            if (step === 3) text += "Format & Difficulty";
+            if (step === 4) text += "Review Assignments";
+            if (step === 5) text += "Final Export";
+
+            getElement('progress-text').textContent = text;
+        }
+        
+        function updateButtonStates() {
+            // Step 1: API Key validation (Using the updated ID)
+            const openaiApiKeyInput = getElement('openai-api-key').value.trim();
+            const claudeaiApiKeyInput = getElement('claudeai-api-key').value.trim();
+            OPENAI_API_KEY = openaiApiKeyInput; // Update global key
+            CLAUDEAI_API_KEY = claudeaiApiKeyInput; // Update global key
+            getElement('step-1-next').disabled = !openaiApiKeyInput || !claudeaiApiKeyInput;
+
+            // ********** MODIFIED Step 2: Topic validation & Button Label **********
+            const hasTopic = appState.selectedTopicIds.length > 0;
+            const topicCount = appState.selectedTopicIds.length;
+            getElement('step-2-next').disabled = !hasTopic;
+            
+            // Custom Topic Search Select button
+            const customTopicInput = getElement('custom-topic-text').value.trim();
+            getElement('select-custom-topic-btn').disabled = !customTopicInput;
+
+            // Update topic selection limit visual
+            updateTopicSelectionVisuals();
+            // **********************************************************************
+
+            // Step 3: Format validation
+            const hasFormat = appState.selectedFormatIds.length > 0;
+            getElement('step-3-next-generate').disabled = !hasFormat;
+
+            // Step 4: Assignment Review validation
+            getElement('submit-assignments').disabled = appState.generatedAssignments.length === 0;
+        }
+
+        function toggleSelection(id, type) {
+            if (type !== 'topic') {
+                const stateArray = appState.selectedFormatIds;
+                const cardElement = getElement(`${type}-${id}`);
+
+                const index = stateArray.indexOf(id);
+                if (index > -1) {
+                    // Deselect
+                    stateArray.splice(index, 1);
+                    cardElement.classList.remove('selected');
+                } else {
+                    // Select
+                    stateArray.push(id);
+                    cardElement.classList.add('selected');
+                }
+                updateButtonStates();
+                return;
+            }
+
+            const stateArray = appState.selectedTopicIds;
+            const cardElement = getElement(`topic-${id}`);
+            const index = stateArray.indexOf(id);
+
+            if (index > -1) {
+                // Deselect
+                stateArray.splice(index, 1);
+                cardElement.classList.remove('selected');
+                // Remove priority number
+                const priorityNum = cardElement.querySelector('.priority-number');
+                if (priorityNum) priorityNum.remove();
+
+                // If the deselected card was custom/uploaded, remove it from TOPIC_POOL
+                if (typeof id === 'string') {
+                    TOPIC_POOL = TOPIC_POOL.filter(t => t.id !== id);
+                    if (id === 'uploaded') appState.uploadedTopic = null;
+                    renderCards(); // Re-render to show the pool without the custom/uploaded card
+                }
+
+            } else {
+                // Select - Check max limit (1-2 topics)
+                if (stateArray.length >= 2) {
+                    // Simple warning or do nothing if max is reached
+                    // alert("You can only select a maximum of 2 topics.");
+                    return; 
+                }
+                
+                // Select
+                stateArray.push(id);
+                cardElement.classList.add('selected');
+            }
+
+            updateButtonStates();
+            renderPriorityNumbers(); // Re-render priorities after change
+        }
+
+        function updateTopicSelectionVisuals() {
+            const topicNames = appState.selectedTopicIds.map(id => {
+                const topic = TOPIC_POOL.find(t => t.id === id);
+                return topic ? topic.name : '';
+            }).filter(Boolean);
+
+            const indicatorText = topicNames.length > 0 
+                ? topicNames.map((name, index) => `#${index + 1} **${name}**`).join(' | ')
+                : 'None';
+
+            getElement('selected-topics-indicator').innerHTML = `Selected Topics (Priority Order): ${indicatorText}`;
+            renderPriorityNumbers(); // Ensure numbers are always up-to-date
+        }
+
+        function renderPriorityNumbers() {
+            // Remove all existing numbers first
+            document.querySelectorAll('.card-topic .priority-number').forEach(el => el.remove());
+
+            // Add numbers to selected cards
+            appState.selectedTopicIds.forEach((id, index) => {
+                const cardElement = getElement(`topic-${id}`);
+                if (cardElement) {
+                    const priorityNum = document.createElement('div');
+                    priorityNum.className = 'priority-number';
+                    priorityNum.textContent = index + 1;
+                    cardElement.appendChild(priorityNum);
+                }
+            });
+        }
+
+        function updateLevel(value) {
+            const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+            const level = levels[value - 1];
+            appState.cefrLevel = level;
+
+            const cefrDisplay = getElement('cefr-display');
+            const levelDescShort = getElement('level-description-short');
+            const levelDescFull = getElement('level-description-full');
+            
+            cefrDisplay.textContent = level;
+            levelDescShort.textContent = CEFR_LEVELS[level].short;
+            levelDescFull.textContent = CEFR_LEVELS[level].full;
+        }
+
+        function toggleDescription() {
+            const desc = getElement('level-description-full');
+            const icon = getElement('toggle-icon');
+            const isHidden = desc.classList.contains('hidden');
+            
+            desc.classList.toggle('hidden', !isHidden);
+            icon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+
+        function renderCards() {
+            const topicContainer = getElement('topic-cards');
+            topicContainer.innerHTML = TOPIC_POOL.map(t => {
+                const isSelected = appState.selectedTopicIds.includes(t.id);
+                const category = t.category || 'Custom'; // Handle custom/uploaded topics
+                const idString = typeof t.id === 'number' ? t.id : `'${t.id}'`;
+
+                return `
+                    <div id="topic-${t.id}" class="card-topic p-4 rounded-xl flex flex-col items-center text-center ${isSelected ? 'selected' : ''}" onclick="toggleSelection(${idString}, 'topic')">
+                        <span class="text-3xl mb-1">${t.icon}</span>
+                        <h3 class="font-semibold text-gray-800">${t.name}</h3>
+                        <p class="text-xs text-gray-500 uppercase font-medium">${category}</p>
+                        ${isSelected ? `<div class="priority-number">${appState.selectedTopicIds.indexOf(t.id) + 1}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            const formatContainer = getElement('format-cards');
+            formatContainer.innerHTML = FORMAT_POOL.map(f => `
+                <div id="format-${f.id}" class="card-format p-4 rounded-xl flex flex-col items-center text-center ${appState.selectedFormatIds.includes(f.id) ? 'selected' : ''}" onclick="toggleSelection('${f.id}', 'format')">
+                    <span class="text-3xl mb-1">${f.icon}</span>
+                    <h3 class="font-semibold text-gray-800">${f.name}</h3>
+                    <p class="text-xs text-gray-500">${f.description}</p>
+                </div>
+            `).join('');
+
+            updateTopicSelectionVisuals(); // Re-render visuals after card update
+        }
+
+        function handleSelectCustomTopic() {
+            const customTopicInput = getElement('custom-topic-text');
+            const topicName = customTopicInput.value.trim();
+
+            if (!topicName) return;
+
+            const customId = 'custom_topic';
+            const newTopic = { 
+                id: customId, 
+                name: topicName, 
+                icon: '🔍', 
+                category: 'Search Term' 
+            };
+
+            // 1. Remove old custom topic card from TOPIC_POOL and selected list if it exists
+            TOPIC_POOL = TOPIC_POOL.filter(t => t.id !== customId);
+            appState.selectedTopicIds = appState.selectedTopicIds.filter(id => id !== customId);
+
+            // 2. Add the new custom topic to the front of the pool
+            TOPIC_POOL.unshift(newTopic);
+
+            // 3. Select the new topic card (this will handle the selection limit/priority)
+            if (appState.selectedTopicIds.length >= 2) {
+                // Deselect the last selected item to make room for the new one (as it's a new focus)
+                const idToDeselect = appState.selectedTopicIds.pop();
+                const elementToDeselect = getElement(`topic-${idToDeselect}`);
+                if (elementToDeselect) elementToDeselect.classList.remove('selected');
+            }
+            
+            appState.selectedTopicIds.push(customId);
+
+            // 4. Re-render cards and update state
+            renderCards();
+            updateButtonStates();
+            
+            // Clear input field after successful selection
+            customTopicInput.value = '';
+            // Ensure the newly created card has the 'selected' class
+            const newCardElement = getElement(`topic-${customId}`);
+            if (newCardElement) newCardElement.classList.add('selected');
+        }
+
+        function handleUploadTopic(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const fileName = file
